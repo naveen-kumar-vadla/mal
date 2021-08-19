@@ -21,5 +21,16 @@ class Vector extends MalValue {
     return '[' + this.ast.map(x => x.toString()).join(' ') + ']';
   }
 }
+class NilValue extends MalValue {
+  constructor() {
+    super();
+  }
 
-module.exports = { List, Vector };
+  toString() {
+    return 'nil';
+  }
+}
+
+const Nil = new NilValue();
+
+module.exports = { List, Vector, Nil };
