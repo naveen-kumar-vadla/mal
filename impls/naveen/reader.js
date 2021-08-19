@@ -38,7 +38,7 @@ const read_seq = (reader, closingCharacter) => {
   reader.next();
 
   while (reader.peek() !== closingCharacter) {
-    if(!reader.peek()) throw new Error(`expected '${closingCharacter}'`);
+    if(!reader.peek()) throw new Error(`unbalanced | expected '${closingCharacter}'`);
     ast.push(read_form(reader));
   }
 
@@ -61,10 +61,10 @@ const read_form = (reader) => {
 
   switch (token[0]) {
     case '(': return read_list(reader);
-    case ')': throw new Error("unexpected ')'");
+    case ')': throw new Error("unbalanced | unexpected ')'");
     
     case '[': return read_vector(reader);
-    case ']': throw new Error("unexpected ']'");
+    case ']': throw new Error("unbalanced | unexpected ']'");
   }
 
   return read_atom(reader);
