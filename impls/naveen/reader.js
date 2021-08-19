@@ -19,7 +19,10 @@ class Reader {
 
 const tokenize = (str) => {
   const regEx = /[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`,;)]*)/g;
-  return [...str.matchAll(regEx)].map((x) => x[1]).slice(0, -1);
+  return [...str.matchAll(regEx)]
+      .map((x) => x[1])
+      .filter(x => x[0] !== ';')
+      .slice(0, -1);
 };
 
 const read_atom = (reader) => {
@@ -30,7 +33,7 @@ const read_atom = (reader) => {
   if (token === 'false') return false;
   if (token === 'nil') return Nil;
   if(token.match(/^"(?:\\.|[^\\"])*"$/)) return new Str(token.slice(1, -1));
-  if(token[0] === '"') throw new Error(`unbalanced | expected '"', got EOF`);
+  if(token[0] === '"') throw new Error(`expected '"', got EOF`);
 
   return token;
 };
@@ -40,7 +43,7 @@ const read_seq = (reader, closingCharacter) => {
   reader.next();
 
   while (reader.peek() !== closingCharacter) {
-    if(!reader.peek()) throw new Error(`unbalanced | expected '${closingCharacter}', got EOF`);
+    if(!reader.peek()) throw new Error(`expected '${closingCharacter}', got EOF`);
     ast.push(read_form(reader));
   }
 
@@ -63,10 +66,10 @@ const read_form = (reader) => {
 
   switch (token[0]) {
     case '(': return read_list(reader);
-    case ')': throw new Error("unbalanced | unexpected ')'");
+    case ')': throw new Error(`unexpected ')'`);
     
     case '[': return read_vector(reader);
-    case ']': throw new Error("unbalanced | unexpected ']'");
+    case ']': throw new Error(`unexpected ']'`);
   }
 
   return read_atom(reader);
