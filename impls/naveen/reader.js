@@ -1,4 +1,4 @@
-const { List } = require('./types');
+const { List, Vector } = require('./types');
 
 class Reader {
   constructor(tokens) {
@@ -30,17 +30,27 @@ const read_atom = (reader) => {
   return token;
 };
 
-const read_list = (reader) => {
+const read_seq = (reader, closingCharacter) => {
   const ast = [];
   reader.next();
 
-  while (reader.peek() !== ')') {
-    if(!reader.peek()) throw new Error("expected ')'");
+  while (reader.peek() !== closingCharacter) {
+    if(!reader.peek()) throw new Error(`expected '${closingCharacter}'`);
     ast.push(read_form(reader));
   }
 
   reader.next();
+  return ast;
+};
+
+const read_list = (reader) => {
+  const ast = read_seq(reader, ')');
   return new List(ast);
+};
+
+const read_vector = (reader) => {
+  const ast = read_seq(reader, ']');
+  return new Vector(ast);
 };
 
 const read_form = (reader) => {
@@ -49,6 +59,9 @@ const read_form = (reader) => {
   switch (token[0]) {
     case '(': return read_list(reader);
     case ')': throw new Error("unexpected ')'");
+    
+    case '[': return read_vector(reader);
+    case ']': throw new Error("unexpected ']'");
   }
 
   return read_atom(reader);
