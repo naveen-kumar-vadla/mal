@@ -30,6 +30,7 @@ const read_atom = (reader) => {
   if (token === 'false') return false;
   if (token === 'nil') return Nil;
   if(token.match(/^"(?:\\.|[^\\"])*"$/)) return new Str(token.slice(1, -1));
+  if(token[0] === '"') throw new Error(`unbalanced | expected '"', got EOF`);
 
   return token;
 };
@@ -39,7 +40,7 @@ const read_seq = (reader, closingCharacter) => {
   reader.next();
 
   while (reader.peek() !== closingCharacter) {
-    if(!reader.peek()) throw new Error(`unbalanced | expected '${closingCharacter}'`);
+    if(!reader.peek()) throw new Error(`unbalanced | expected '${closingCharacter}', got EOF`);
     ast.push(read_form(reader));
   }
 
