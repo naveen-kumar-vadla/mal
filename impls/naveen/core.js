@@ -70,6 +70,11 @@ const isGreater = (...args) => {
   return args.reduce((a, b) => a > b);
 };
 
+const isGreaterOrEqual = (...args) => {
+  if (args.length < 2) args.unshift(Infinity);
+  return args.reduce((a, b) => a >= b);
+};
+
 const coreEnv = new Env();
 
 coreEnv.set(new MalSymbol('+'), add);
@@ -93,5 +98,6 @@ coreEnv.set(new MalSymbol('='), isEqual);
 coreEnv.set(new MalSymbol('<'), isLesser);
 coreEnv.set(new MalSymbol('<='), isLesserOrEqual);
 coreEnv.set(new MalSymbol('>'), isGreater);
+coreEnv.set(new MalSymbol('>='), isGreaterOrEqual);
 
 module.exports = { coreEnv };
