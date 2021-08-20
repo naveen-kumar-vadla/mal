@@ -67,6 +67,10 @@ const EVAL = (ast, env) => {
     return EVAL(ast.ast[2], newEnv);
   }
   if(symbol === 'do') return ast.ast.slice(1).reduce((_, form) => EVAL(form, env), Nil);
+  if(symbol === 'if') {
+    const expr = EVAL(ast.ast[1]);
+    return (expr === Nil || expr === false) ? EVAL(ast.ast[3]) : EVAL(ast.ast[2]);
+  }
 
   const [fn, ...args] = eval_ast(ast, env).ast;
   if(!(fn instanceof Function)) throw new Error(`'${fn}' is not a function`);
