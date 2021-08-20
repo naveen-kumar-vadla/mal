@@ -2,6 +2,7 @@ const readline = require('readline');
 const { read_str } = require('./reader');
 const { print_str } = require('./printer');
 const { MalSymbol, List, Vector, HashMap } = require('./types');
+const { Env } = require('./env');
 
 const options = {
   input: process.stdin,
@@ -10,18 +11,17 @@ const options = {
 
 const rl = readline.createInterface(options);
 
-const env = {
-  '+': (a, b) => a + b,
-  '-': (a, b) => a - b,
-  '*': (a, b) => a * b,
-  '/': (a, b) => a / b,
-  '%': (a, b) => a % b,
-  'pi': Math.PI
-};
+const env = new Env();
+env.set(new MalSymbol('pi'), Math.PI);
+env.set(new MalSymbol('+'), (a, b) => a + b);
+env.set(new MalSymbol('*'), (a, b) => a * b);
+env.set(new MalSymbol('-'), (a, b) => a - b);
+env.set(new MalSymbol('/'), (a, b) => a / b);
+env.set(new MalSymbol('%'), (a, b) => a % b);
 
 const eval_ast = (ast, env) => {
   if(ast instanceof MalSymbol) {
-    const val = env[ast.symbol];
+    const val = env.get(ast);
     if(val) return val;
     throw new Error(`symbol '${ast.symbol}' not found`);
   }
