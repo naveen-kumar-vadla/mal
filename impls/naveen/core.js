@@ -1,5 +1,5 @@
 const { Env } = require('./env');
-const { MalSymbol, Nil, Str, List, Vector } = require('./types');
+const { MalSymbol, Nil, Str, List, Vector, isEqual } = require('./types');
 const { print_str } = require('./printer');
 
 const add = (...args) => {
@@ -73,5 +73,7 @@ coreEnv.set(new MalSymbol('list'), makeList);
 coreEnv.set(new MalSymbol('list?'), isList);
 coreEnv.set(new MalSymbol('empty?'), isListEmpty);
 coreEnv.set(new MalSymbol('count?'), count);
+
+coreEnv.set(new MalSymbol('='), isEqual);
 
 module.exports = { coreEnv };
