@@ -55,6 +55,11 @@ const count = (list) => {
   return list.count();
 };
 
+const isLesser = (...args) => {
+  if (args.length < 2) args.unshift(-Infinity);
+  return args.reduce((a, b) => a < b);
+};
+
 const coreEnv = new Env();
 
 coreEnv.set(new MalSymbol('+'), add);
@@ -75,5 +80,6 @@ coreEnv.set(new MalSymbol('empty?'), isListEmpty);
 coreEnv.set(new MalSymbol('count?'), count);
 
 coreEnv.set(new MalSymbol('='), isEqual);
+coreEnv.set(new MalSymbol('<'), isLesser);
 
 module.exports = { coreEnv };
