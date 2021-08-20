@@ -142,7 +142,8 @@ class Keyword extends MalValue {
   }
 
   isEqual(other) {
-    return (other instanceof Keyword) && this.string === other.string;
+    console.log(`this, other`, this, other);
+    return (other instanceof Keyword) && this.keyword === other.keyword;
   }
 }
 
@@ -157,7 +158,7 @@ class MalSymbol extends MalValue {
   }
 
   isEqual(other) {
-    return (other instanceof MalSymbol) && this.string === other.string;
+    return (other instanceof MalSymbol) && this.symbol === other.symbol;
   }
 }
 
@@ -168,6 +169,10 @@ class NilValue extends MalValue {
 
   print_str(print_readably = false) {
     return 'nil';
+  }
+
+  count() {
+    return 0;
   }
 
   isEqual(other) {
