@@ -1,5 +1,5 @@
 const { Env } = require('./env');
-const { MalSymbol, Nil, Str } = require('./types');
+const { MalSymbol, Nil, Str, List } = require('./types');
 const { print_str } = require('./printer');
 
 const add = (...args) => {
@@ -41,6 +41,8 @@ const pr_str = (...args) => new Str(args.map(x => print_str(x, true)).join(' '))
 
 const str = (...args) => new Str(args.map(x => print_str(x, false)).join(''));
 
+const makeList = (...args) => new List(args);
+
 const coreEnv = new Env();
 
 coreEnv.set(new MalSymbol('+'), add);
@@ -49,9 +51,12 @@ coreEnv.set(new MalSymbol('*'), multiply);
 coreEnv.set(new MalSymbol('/'), divide);
 coreEnv.set(new MalSymbol('%'), reminder);
 coreEnv.set(new MalSymbol('pi'), Math.PI);
+
 coreEnv.set(new MalSymbol('prn'), prn);
 coreEnv.set(new MalSymbol('println'), println);
 coreEnv.set(new MalSymbol('pr-str'), pr_str);
 coreEnv.set(new MalSymbol('str'), str);
+
+coreEnv.set(new MalSymbol('list'), makeList);
 
 module.exports = { coreEnv };
