@@ -71,6 +71,7 @@ const EVAL = (ast, env) => {
     const expr = EVAL(ast.ast[1]);
     return (expr === Nil || expr === false) ? EVAL(ast.ast[3]) : EVAL(ast.ast[2]);
   }
+  if(symbol === 'fn*') return (...exprs) => EVAL(ast.ast[2], Env.create(env, ast.ast[1].ast, exprs));
 
   const [fn, ...args] = eval_ast(ast, env).ast;
   if(!(fn instanceof Function)) throw new Error(`'${fn}' is not a function`);

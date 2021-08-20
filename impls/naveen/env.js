@@ -28,6 +28,15 @@ class Env {
 
     throw new Error(`symbol '${key.symbol}' not found`);
   }
+
+  static create(outer = null, binds = [], exprs = []) {
+    if(binds.length !== exprs.length) throw new Error(`binds and expressions are not equal`);
+    
+    const env = new Env(outer);
+    binds.forEach((symbol, index) => env.set(symbol, exprs[index]));
+    
+    return env;
+  }
 }
 
 module.exports = { Env };
