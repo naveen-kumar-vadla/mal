@@ -50,6 +50,11 @@ const isListEmpty = (list) => {
   return list.isEmpty();
 };
 
+const count = (list) => {
+  if(!(list instanceof List) && !(list instanceof Vector) && !(list instanceof Str)) throw new Error(`cannot check 'count' for ${print_str(list)}`);
+  return list.count();
+};
+
 const coreEnv = new Env();
 
 coreEnv.set(new MalSymbol('+'), add);
@@ -67,5 +72,6 @@ coreEnv.set(new MalSymbol('str'), str);
 coreEnv.set(new MalSymbol('list'), makeList);
 coreEnv.set(new MalSymbol('list?'), isList);
 coreEnv.set(new MalSymbol('empty?'), isListEmpty);
+coreEnv.set(new MalSymbol('count?'), count);
 
 module.exports = { coreEnv };

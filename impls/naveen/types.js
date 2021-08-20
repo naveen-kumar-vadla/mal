@@ -22,6 +22,10 @@ class List extends MalValue {
   isEmpty() {
     return this.ast.length === 0;
   }
+
+  count() {
+    return this.ast.length;
+  }
 }
 
 class Vector extends MalValue {
@@ -36,6 +40,10 @@ class Vector extends MalValue {
 
   isEmpty() {
     return this.ast.length === 0;
+  }
+
+  count() {
+    return this.ast.length;
   }
 }
 
@@ -76,6 +84,10 @@ class Str extends MalValue {
           + '"';
     }
     return '"' + this.string + '"';
+  }
+
+  count() {
+    return this.string.length;
   }
 }
 
