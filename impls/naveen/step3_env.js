@@ -59,6 +59,13 @@ const EVAL = (ast, env) => {
 
   const symbol = ast.ast[0].symbol;
   if(symbol === 'def!') return env.set(ast.ast[1], EVAL(ast.ast[2], env));
+  if(symbol === 'let*') {
+    const newEnv = new Env(env);
+    const bindings = ast.ast[1].ast;
+
+    for(let i = 0; i < bindings.length; i += 2) newEnv.set(bindings[i], EVAL(bindings[i + 1], newEnv));
+    return EVAL(ast.ast[2], newEnv);
+  }
 
   const [fn, ...args] = eval_ast(ast, env).ast;
   if(!(fn instanceof Function)) throw new Error(`'${fn}' is not a function`);
