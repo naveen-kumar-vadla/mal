@@ -1,7 +1,7 @@
 const readline = require('readline');
 const { read_str } = require('./reader');
 const { print_str } = require('./printer');
-const { MalSymbol, List, Vector } = require('./types');
+const { MalSymbol, List, Vector, HashMap } = require('./types');
 
 const options = {
   input: process.stdin,
@@ -27,6 +27,11 @@ const eval_ast = (ast, env) => {
   }
   if(ast instanceof List) return new List(ast.ast.map(x => EVAL(x, env)));
   if(ast instanceof Vector) return new Vector(ast.ast.map(x => EVAL(x, env)));
+  if(ast instanceof HashMap) {
+    const newAst = [];
+    for(const [key, value] of ast.hashmap.entries()) newAst.push(EVAL(key, env), EVAL(value, env));
+    return new HashMap(newAst);
+  }
 
   return ast;
 };
