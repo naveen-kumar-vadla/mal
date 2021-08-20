@@ -3,6 +3,7 @@ const { read_str } = require('./reader');
 const { print_str } = require('./printer');
 const { MalSymbol, List, Vector, HashMap, Nil } = require('./types');
 const { Env } = require('./env');
+const { coreEnv } = require('./core');
 
 const options = {
   input: process.stdin,
@@ -11,28 +12,7 @@ const options = {
 
 const rl = readline.createInterface(options);
 
-const env = new Env();
-env.set(new MalSymbol('pi'), Math.PI);
-env.set(new MalSymbol('+'), (...args) => {
-  if(args.length < 2) args.unshift(0);
-  return args.reduce((a, b) => a + b)
-});
-env.set(new MalSymbol('-'), (...args) => {
-  if(args.length < 2) args.unshift(0);
-  return args.reduce((a, b) => a - b)
-});
-env.set(new MalSymbol('*'), (...args) => {
-  if(args.length < 2) args.unshift(1);
-  return args.reduce((a, b) => a * b)
-});
-env.set(new MalSymbol('/'), (...args) => {
-  if(args.length < 2) args.unshift(1);
-  return args.reduce((a, b) => a / b)
-});
-env.set(new MalSymbol('%'), (...args) => {
-  if(args.length < 2) args.unshift(0);
-  return args.reduce((a, b) => a % b)
-});
+const env = new Env(coreEnv);
 
 const eval_ast = (ast, env) => {
   if(ast instanceof MalSymbol) return env.get(ast);
