@@ -30,6 +30,28 @@ class Vector extends MalValue {
     return '[' + this.ast.map(x => print_str(x, print_readably)).join(' ') + ']';
   }
 }
+class HashMap extends MalValue {
+  constructor(ast) {
+    super();
+    this.ast = ast;
+    this.hashmap = new Map();
+    this.initialiseHashMap();
+  }
+
+  initialiseHashMap() {
+    for(let i = 0; i < this.ast.length; i += 2) {
+      this.hashmap.set(this.ast[i], this.ast[i + 1]);
+    }
+  }
+
+  print_str(print_readably = false) {
+    const str = [];
+    for(const [key, value] of this.hashmap.entries()) { 
+      str.push(print_str(key, print_readably) + ' ' + print_str(value, print_readably));
+    }
+    return '{' + str.join(', ') + '}'
+  }
+}
 
 class Str extends MalValue {
   constructor(string) {
@@ -82,4 +104,4 @@ class NilValue extends MalValue {
 
 const Nil = new NilValue();
 
-module.exports = { List, Vector, Nil, Str, Keyword, MalSymbol, print_str };
+module.exports = { List, Vector, Nil, Str, Keyword, MalSymbol, HashMap, print_str };

@@ -1,4 +1,4 @@
-const { List, Vector, Nil, Str, Keyword, MalSymbol } = require('./types');
+const { List, Vector, Nil, Str, Keyword, MalSymbol, HashMap } = require('./types');
 
 class Reader {
   constructor(tokens) {
@@ -37,7 +37,7 @@ const read_atom = (reader) => {
     const str = token.slice(1, token.length - 1).replace(/\\(.)/g, (_, c) => c === "n" ? "\n" : c)
     return new Str(str);
   }
-  if(token[0] === '"') throw new Error(`expected '"', got EOF`);
+  if(token[0] === '"') throw new Error(`expected '"', got end of input`);
 
   return new MalSymbol(token);
 };
@@ -47,7 +47,7 @@ const read_seq = (reader, closingCharacter) => {
   reader.next();
 
   while (reader.peek() !== closingCharacter) {
-    if(!reader.peek()) throw new Error(`expected '${closingCharacter}', got EOF`);
+    if(!reader.peek()) throw new Error(`expected '${closingCharacter}', got end of input`);
     ast.push(read_form(reader));
   }
 
@@ -65,6 +65,12 @@ const read_vector = (reader) => {
   return new Vector(ast);
 };
 
+const read_hashmap = (reader) => {
+  const ast = read_seq(reader, '}');
+  if(ast.length % 2 !== 0) throw new Error('Odd number of hash map arguments');
+  return new HashMap(ast);
+};
+
 const read_form = (reader) => {
   const token = reader.peek();
 
@@ -74,6 +80,9 @@ const read_form = (reader) => {
     
     case '[': return read_vector(reader);
     case ']': throw new Error(`unexpected ']'`);
+    
+    case '{': return read_hashmap(reader);
+    case '}': throw new Error(`unexpected '}'`);
   }
 
   return read_atom(reader);
