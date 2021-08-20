@@ -32,7 +32,10 @@ const read_atom = (reader) => {
   if (token === 'true') return true;
   if (token === 'false') return false;
   if (token === 'nil') return Nil;
-  if(token.match(/^"(?:\\.|[^\\"])*"$/)) return new Str(token.slice(1, -1));
+  if(token.match(/^"(?:\\.|[^\\"])*"$/)) {
+    const str = token.slice(1, token.length - 1).replace(/\\(.)/g, (_, c) => c === "n" ? "\n" : c)
+    return new Str(str);
+  }
   if(token[0] === '"') throw new Error(`expected '"', got EOF`);
 
   return token;
