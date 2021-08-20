@@ -57,6 +57,9 @@ const EVAL = (ast, env) => {
   if(!(ast instanceof List)) return eval_ast(ast, env);
   if(ast.isEmpty()) return ast;
 
+  const symbol = ast.ast[0].symbol;
+  if(symbol === 'def!') return env.set(ast.ast[1], EVAL(ast.ast[2], env));
+
   const [fn, ...args] = eval_ast(ast, env).ast;
   if(!(fn instanceof Function)) throw new Error(`'${fn}' is not a function`);
 
