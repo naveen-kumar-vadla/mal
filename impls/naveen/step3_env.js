@@ -13,11 +13,26 @@ const rl = readline.createInterface(options);
 
 const env = new Env();
 env.set(new MalSymbol('pi'), Math.PI);
-env.set(new MalSymbol('+'), (a, b) => a + b);
-env.set(new MalSymbol('*'), (a, b) => a * b);
-env.set(new MalSymbol('-'), (a, b) => a - b);
-env.set(new MalSymbol('/'), (a, b) => a / b);
-env.set(new MalSymbol('%'), (a, b) => a % b);
+env.set(new MalSymbol('+'), (...args) => {
+  if(args.length < 2) args.unshift(0);
+  return args.reduce((a, b) => a + b)
+});
+env.set(new MalSymbol('-'), (...args) => {
+  if(args.length < 2) args.unshift(0);
+  return args.reduce((a, b) => a - b)
+});
+env.set(new MalSymbol('*'), (...args) => {
+  if(args.length < 2) args.unshift(1);
+  return args.reduce((a, b) => a * b)
+});
+env.set(new MalSymbol('/'), (...args) => {
+  if(args.length < 2) args.unshift(1);
+  return args.reduce((a, b) => a / b)
+});
+env.set(new MalSymbol('%'), (...args) => {
+  if(args.length < 2) args.unshift(0);
+  return args.reduce((a, b) => a % b)
+});
 
 const eval_ast = (ast, env) => {
   if(ast instanceof MalSymbol) {
