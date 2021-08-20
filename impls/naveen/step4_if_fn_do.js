@@ -1,7 +1,7 @@
 const readline = require('readline');
 const { read_str } = require('./reader');
 const { print_str } = require('./printer');
-const { MalSymbol, List, Vector, HashMap } = require('./types');
+const { MalSymbol, List, Vector, HashMap, Nil } = require('./types');
 const { Env } = require('./env');
 
 const options = {
@@ -66,6 +66,7 @@ const EVAL = (ast, env) => {
     for(let i = 0; i < bindings.length; i += 2) newEnv.set(bindings[i], EVAL(bindings[i + 1], newEnv));
     return EVAL(ast.ast[2], newEnv);
   }
+  if(symbol === 'do') return ast.ast.slice(1).reduce((_, form) => EVAL(form, env), Nil);
 
   const [fn, ...args] = eval_ast(ast, env).ast;
   if(!(fn instanceof Function)) throw new Error(`'${fn}' is not a function`);
