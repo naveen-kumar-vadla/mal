@@ -60,6 +60,11 @@ const isLesser = (...args) => {
   return args.reduce((a, b) => a < b);
 };
 
+const isLesserOrEqual = (...args) => {
+  if (args.length < 2) args.unshift(-Infinity);
+  return args.reduce((a, b) => a <= b);
+};
+
 const isGreater = (...args) => {
   if (args.length < 2) args.unshift(Infinity);
   return args.reduce((a, b) => a > b);
@@ -86,6 +91,7 @@ coreEnv.set(new MalSymbol('count?'), count);
 
 coreEnv.set(new MalSymbol('='), isEqual);
 coreEnv.set(new MalSymbol('<'), isLesser);
+coreEnv.set(new MalSymbol('<='), isLesserOrEqual);
 coreEnv.set(new MalSymbol('>'), isGreater);
 
 module.exports = { coreEnv };
