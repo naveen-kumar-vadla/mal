@@ -1,5 +1,5 @@
 const { Env } = require('./env');
-const { MalSymbol, Nil, Str, List } = require('./types');
+const { MalSymbol, Nil, Str, List, Vector } = require('./types');
 const { print_str } = require('./printer');
 
 const add = (...args) => {
@@ -45,6 +45,11 @@ const makeList = (...args) => new List(args);
 
 const isList = (list) => (list instanceof List);
 
+const isListEmpty = (list) => {
+  if(!(list instanceof List) && !(list instanceof Vector)) throw new Error(`cannot check 'empty?' for ${print_str(list)}`);
+  return list.isEmpty();
+};
+
 const coreEnv = new Env();
 
 coreEnv.set(new MalSymbol('+'), add);
@@ -61,5 +66,6 @@ coreEnv.set(new MalSymbol('str'), str);
 
 coreEnv.set(new MalSymbol('list'), makeList);
 coreEnv.set(new MalSymbol('list?'), isList);
+coreEnv.set(new MalSymbol('empty?'), isListEmpty);
 
 module.exports = { coreEnv };
