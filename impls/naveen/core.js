@@ -43,6 +43,8 @@ const str = (...args) => new Str(args.map(x => print_str(x, false)).join(''));
 
 const makeList = (...args) => new List(args);
 
+const isList = (list) => (list instanceof List);
+
 const coreEnv = new Env();
 
 coreEnv.set(new MalSymbol('+'), add);
@@ -58,5 +60,6 @@ coreEnv.set(new MalSymbol('pr-str'), pr_str);
 coreEnv.set(new MalSymbol('str'), str);
 
 coreEnv.set(new MalSymbol('list'), makeList);
+coreEnv.set(new MalSymbol('list?'), isList);
 
 module.exports = { coreEnv };
