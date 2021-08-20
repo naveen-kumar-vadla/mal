@@ -37,6 +37,8 @@ const println = (...args) => {
   return Nil;
 };
 
+const pr_str = (...args) => new Str(args.map(x => print_str(x, true)).join(' '));
+
 const coreEnv = new Env();
 
 coreEnv.set(new MalSymbol('+'), add);
@@ -47,5 +49,6 @@ coreEnv.set(new MalSymbol('%'), reminder);
 coreEnv.set(new MalSymbol('pi'), Math.PI);
 coreEnv.set(new MalSymbol('prn'), prn);
 coreEnv.set(new MalSymbol('println'), println);
+coreEnv.set(new MalSymbol('pr-str'), pr_str);
 
 module.exports = { coreEnv };
