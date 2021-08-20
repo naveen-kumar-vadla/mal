@@ -35,11 +35,7 @@ env.set(new MalSymbol('%'), (...args) => {
 });
 
 const eval_ast = (ast, env) => {
-  if(ast instanceof MalSymbol) {
-    const val = env.get(ast);
-    if(val) return val;
-    throw new Error(`symbol '${ast.symbol}' not found`);
-  }
+  if(ast instanceof MalSymbol) return env.get(ast);
   if(ast instanceof List) return new List(ast.ast.map(x => EVAL(x, env)));
   if(ast instanceof Vector) return new Vector(ast.ast.map(x => EVAL(x, env)));
   if(ast instanceof HashMap) {
@@ -54,6 +50,7 @@ const eval_ast = (ast, env) => {
 const READ = (str) => read_str(str);
 
 const EVAL = (ast, env) => {
+  if(ast === undefined) return Nil;
   if(!(ast instanceof List)) return eval_ast(ast, env);
   if(ast.isEmpty()) return ast;
 
@@ -68,8 +65,8 @@ const EVAL = (ast, env) => {
   }
   if(symbol === 'do') return ast.ast.slice(1).reduce((_, form) => EVAL(form, env), Nil);
   if(symbol === 'if') {
-    const expr = EVAL(ast.ast[1]);
-    return (expr === Nil || expr === false) ? EVAL(ast.ast[3]) : EVAL(ast.ast[2]);
+    const expr = EVAL(ast.ast[1], env);
+    return (expr === Nil || expr === false) ? EVAL(ast.ast[3], env) : EVAL(ast.ast[2], env);
   }
   if(symbol === 'fn*') return (...exprs) => EVAL(ast.ast[2], Env.create(env, ast.ast[1].ast, exprs));
 
