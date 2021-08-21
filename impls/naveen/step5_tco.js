@@ -35,8 +35,12 @@ const EVAL = (ast, env) => {
   if(ast.isEmpty()) return ast;
 
   const symbol = ast.ast[0].symbol;
-  if(symbol === 'def!') return env.set(ast.ast[1], EVAL(ast.ast[2], env));
+  if(symbol === 'def!') {
+    if(ast.ast.length !== 3) throw new Error('Too many arguments to def!');
+    return env.set(ast.ast[1], EVAL(ast.ast[2], env));
+  }
   if(symbol === 'let*') {
+    if(ast.ast.length !== 3) throw new Error('Too many arguments to let*');
     const newEnv = new Env(env);
     const bindings = ast.ast[1].ast;
 
@@ -61,6 +65,7 @@ const PRINT = (ast) => print_str(ast, true);
 const rep = (str) => PRINT(EVAL(READ(str), env));
 
 rep('(def! not (fn* (x) (if x false true)))');
+rep('(def! sqrt (fn* (x) (* x x)))');
 
 const main = () => {
   rl.question('user> ', (str) => {
