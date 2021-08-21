@@ -1,4 +1,4 @@
-const { MalSymbol } = require('./types');
+const { MalSymbol, print_str } = require('./types');
 
 class Env {
   constructor(outer = null) {
@@ -30,11 +30,20 @@ class Env {
   }
 
   static create(outer = null, binds = [], exprs = []) {
-    if(binds.length !== exprs.length) throw new Error(`binds and expressions are not equal`);
-    
     const env = new Env(outer);
-    binds.forEach((symbol, index) => env.set(symbol, exprs[index]));
-    
+    let andNotFound = true;
+
+    for(let i = 0; i < binds.length && andNotFound; i++) {
+      let key = binds[i];
+      let value = exprs[i];
+      if(key.symbol === '&') {
+        key = binds[i+1];
+        value = exprs.slice(i);
+        andNotFound = false;
+      }
+      if(value === undefined) throw new Error(`No value provided for '${print_str(key)}'`);
+      env.set(key, value);
+    }
     return env;
   }
 }
