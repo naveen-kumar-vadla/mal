@@ -43,7 +43,7 @@ const str = (...args) => new Str(args.map(x => print_str(x, false)).join(''));
 
 const makeList = (...args) => new List(args);
 
-const isList = (list) => (list instanceof List);
+const isList = (list) => (list instanceof List) || (Array.isArray(list));
 
 const isListEmpty = (list) => {
   if(!(list instanceof List) && !(list instanceof Vector)) throw new Error(`cannot check 'empty?' for ${print_str(list)}`);
@@ -51,8 +51,9 @@ const isListEmpty = (list) => {
 };
 
 const count = (list) => {
-  if(!(list instanceof List) && !(list instanceof Vector) && !(list instanceof Str) && (list !== Nil)) throw new Error(`cannot check 'count' for ${print_str(list)}`);
-  return list.count();
+  if((list instanceof List) || (list instanceof Vector) || (list instanceof Str) || (list === Nil)) return list.count();
+  if(list.length !== undefined) return list.length;
+  throw new Error(`cannot check 'count' for ${print_str(list)}`);
 };
 
 const isLesser = (...args) => {
