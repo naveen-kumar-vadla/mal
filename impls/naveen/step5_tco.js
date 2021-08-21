@@ -30,34 +30,38 @@ const eval_ast = (ast, env) => {
 const READ = (str) => read_str(str);
 
 const EVAL = (ast, env) => {
-  if(ast === undefined) return Nil;
-  if(!(ast instanceof List)) return eval_ast(ast, env);
-  if(ast.isEmpty()) return ast;
+  while(true) {
+    if(ast === undefined) return Nil;
+    if(!(ast instanceof List)) return eval_ast(ast, env);
+    if(ast.isEmpty()) return ast;
 
-  const symbol = ast.ast[0].symbol;
-  if(symbol === 'def!') {
-    if(ast.ast.length !== 3) throw new Error('Too many arguments to def!');
-    return env.set(ast.ast[1], EVAL(ast.ast[2], env));
+    const symbol = ast.ast[0].symbol;
+    if(symbol === 'def!') {
+      if(ast.ast.length !== 3) throw new Error('Too many arguments to def!');
+      return env.set(ast.ast[1], EVAL(ast.ast[2], env));
+    }
+    if(symbol === 'let*') {
+      if(ast.ast.length !== 3) throw new Error('Too many arguments to let*');
+      const newEnv = new Env(env);
+      const bindings = ast.ast[1].ast;
+
+      for(let i = 0; i < bindings.length; i += 2) newEnv.set(bindings[i], EVAL(bindings[i + 1], newEnv));
+      ast = ast.ast[2];
+      env = newEnv;
+      continue;
+    }
+    if(symbol === 'do') return ast.ast.slice(1).reduce((_, form) => EVAL(form, env), Nil);
+    if(symbol === 'if') {
+      const expr = EVAL(ast.ast[1], env);
+      return (expr === Nil || expr === false) ? EVAL(ast.ast[3], env) : EVAL(ast.ast[2], env);
+    }
+    if(symbol === 'fn*') return (...exprs) => EVAL(ast.ast[2], Env.create(env, ast.ast[1].ast, exprs));
+
+    const [fn, ...args] = eval_ast(ast, env).ast;
+    if(!(fn instanceof Function)) throw new Error(`'${fn}' is not a function`);
+
+    return fn.apply(null, args);
   }
-  if(symbol === 'let*') {
-    if(ast.ast.length !== 3) throw new Error('Too many arguments to let*');
-    const newEnv = new Env(env);
-    const bindings = ast.ast[1].ast;
-
-    for(let i = 0; i < bindings.length; i += 2) newEnv.set(bindings[i], EVAL(bindings[i + 1], newEnv));
-    return EVAL(ast.ast[2], newEnv);
-  }
-  if(symbol === 'do') return ast.ast.slice(1).reduce((_, form) => EVAL(form, env), Nil);
-  if(symbol === 'if') {
-    const expr = EVAL(ast.ast[1], env);
-    return (expr === Nil || expr === false) ? EVAL(ast.ast[3], env) : EVAL(ast.ast[2], env);
-  }
-  if(symbol === 'fn*') return (...exprs) => EVAL(ast.ast[2], Env.create(env, ast.ast[1].ast, exprs));
-
-  const [fn, ...args] = eval_ast(ast, env).ast;
-  if(!(fn instanceof Function)) throw new Error(`'${fn}' is not a function`);
-
-  return fn.apply(null, args);
 }
 
 const PRINT = (ast) => print_str(ast, true);
