@@ -1,5 +1,5 @@
 const { Env } = require('./env');
-const { MalSymbol, Nil, Str, List, Vector, isEqual } = require('./types');
+const { MalValue, MalSymbol, Nil, Str, List, isEqual } = require('./types');
 const { print_str } = require('./printer');
 
 const add = (...args) => {
@@ -22,7 +22,7 @@ const divide = (...args) => {
   return args.reduce((a, b) => a / b);
 };
 
-const reminder = (...args) => {
+const remainder = (...args) => {
   if (args.length < 2) args.unshift(0);
   return args.reduce((a, b) => a % b);
 };
@@ -45,15 +45,16 @@ const makeList = (...args) => new List(args);
 
 const isList = (list) => (list instanceof List) || (Array.isArray(list));
 
-const isListEmpty = (list) => {
-  if(!(list instanceof List) && !(list instanceof Vector)) throw new Error(`cannot check 'empty?' for ${print_str(list)}`);
-  return list.isEmpty();
+const isEmpty = (ast) => {
+  if(ast instanceof MalValue) return ast.isEmpty();
+  if(ast.length !== undefined) return ast.length === 0;
+  throw new Error(`cannot check 'empty?' for ${print_str(ast)}`);
 };
 
-const count = (list) => {
-  if((list instanceof List) || (list instanceof Vector) || (list instanceof Str) || (list === Nil)) return list.count();
-  if(list.length !== undefined) return list.length;
-  throw new Error(`cannot check 'count' for ${print_str(list)}`);
+const count = (ast) => {
+  if(ast instanceof MalValue) return ast.count();
+  if(ast.length !== undefined) return ast.length;
+  throw new Error(`cannot check 'count' for ${print_str(ast)}`);
 };
 
 const isLesser = (...args) => {
@@ -82,7 +83,7 @@ coreEnv.set(new MalSymbol('+'), add);
 coreEnv.set(new MalSymbol('-'), subtract);
 coreEnv.set(new MalSymbol('*'), multiply);
 coreEnv.set(new MalSymbol('/'), divide);
-coreEnv.set(new MalSymbol('%'), reminder);
+coreEnv.set(new MalSymbol('%'), remainder);
 coreEnv.set(new MalSymbol('pi'), Math.PI);
 
 coreEnv.set(new MalSymbol('prn'), prn);
@@ -92,7 +93,7 @@ coreEnv.set(new MalSymbol('str'), str);
 
 coreEnv.set(new MalSymbol('list'), makeList);
 coreEnv.set(new MalSymbol('list?'), isList);
-coreEnv.set(new MalSymbol('empty?'), isListEmpty);
+coreEnv.set(new MalSymbol('empty?'), isEmpty);
 coreEnv.set(new MalSymbol('count'), count);
 
 coreEnv.set(new MalSymbol('='), isEqual);
