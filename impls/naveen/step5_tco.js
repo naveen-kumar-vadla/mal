@@ -50,7 +50,12 @@ const EVAL = (ast, env) => {
       env = newEnv;
       continue;
     }
-    if(symbol === 'do') return ast.ast.slice(1).reduce((_, form) => EVAL(form, env), Nil);
+    if(symbol === 'do') {
+      ast.ast.slice(1, -1).forEach(form => EVAL(form, env));
+      ast = ast.ast[ast.ast.length - 1];
+      env = env;
+      continue;
+    }
     if(symbol === 'if') {
       const expr = EVAL(ast.ast[1], env);
       return (expr === Nil || expr === false) ? EVAL(ast.ast[3], env) : EVAL(ast.ast[2], env);
