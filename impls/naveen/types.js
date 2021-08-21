@@ -119,7 +119,7 @@ class Str extends MalValue {
               .replace(/\n/g, '\\n')
           + '"';
     }
-    return '"' + this.string + '"';
+    return this.string;
   }
 
   count() {
