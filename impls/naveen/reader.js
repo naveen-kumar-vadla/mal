@@ -47,7 +47,7 @@ const read_seq = (reader, closingCharacter) => {
   reader.next();
 
   while (reader.peek() !== closingCharacter) {
-    if(!reader.peek()) throw new Error(`expected '${closingCharacter}', got end of input`);
+    if(reader.peek() === undefined) throw new Error(`expected '${closingCharacter}', got end of input`);
     ast.push(read_form(reader));
   }
 

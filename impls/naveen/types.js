@@ -27,7 +27,7 @@ class List extends MalValue {
   }
 
   print_str(print_readably = false) {
-    return '(' + this.ast.map(x => print_str(x, print_readably)).join(' ') + ')';
+    return `(${this.ast.map(x => print_str(x, print_readably)).join(' ')})`;
   }
 
   isEmpty() {
@@ -54,7 +54,7 @@ class Vector extends MalValue {
   }
 
   print_str(print_readably = false) {
-    return '[' + this.ast.map(x => print_str(x, print_readably)).join(' ') + ']';
+    return `[${this.ast.map(x => print_str(x, print_readably)).join(' ')}]`;
   }
 
   isEmpty() {
@@ -90,10 +90,14 @@ class HashMap extends MalValue {
 
   print_str(print_readably = false) {
     const str = [];
-    for(const [key, value] of this.hashmap.entries()) { 
-      str.push(print_str(key, print_readably) + ' ' + print_str(value, print_readably));
+    
+    for(const [k, v] of this.hashmap.entries()) { 
+      const key = print_str(k, print_readably);
+      const value = print_str(v, print_readably);
+      str.push(`${key} ${value}`);
     }
-    return '{' + str.join(', ') + '}'
+
+    return `{${str.join(', ')}}`;
   }
 
   isEqual(other) {
@@ -113,13 +117,8 @@ class Str extends MalValue {
   }
 
   print_str(print_readably = false) {
-    if (print_readably) {
-      return '"' + this.string.replace(/\\/g, '\\\\')
-              .replace(/"/g, '\\"')
-              .replace(/\n/g, '\\n')
-          + '"';
-    }
-    return this.string;
+    if (!print_readably) return this.string;
+    return `"${this.string.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n')}"`
   }
 
   count() {
@@ -138,11 +137,10 @@ class Keyword extends MalValue {
   }
 
   print_str(print_readably = false) {
-    return ':' + this.keyword;
+    return `:${this.keyword}`;
   }
 
   isEqual(other) {
-    console.log(`this, other`, this, other);
     return (other instanceof Keyword) && this.keyword === other.keyword;
   }
 }
