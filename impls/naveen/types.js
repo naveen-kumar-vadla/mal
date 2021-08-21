@@ -1,5 +1,5 @@
 const print_str = (ast, print_readably) => {
-  if (ast instanceof MalValue) return ast.print_str(print_readably);
+  if(ast instanceof MalValue) return ast.print_str(print_readably);
   return ast.toString();
 };
 
@@ -49,7 +49,7 @@ class List extends MalValue {
       return false;
     }
 
-    return this.ast.every((val, i) => isEqual(val, other.ast[i]))
+    return this.ast.every((val, i) => isEqual(val, other.ast[i]));
   }
 }
 
@@ -70,13 +70,13 @@ class Vector extends MalValue {
   count() {
     return this.ast.length;
   }
-  
+
   isEqual(other) {
     if((!(other instanceof List) && !(other instanceof Vector)) || other.count() !== this.count()) {
       return false;
     }
 
-    return this.ast.every((val, i) => isEqual(val, other.ast[i]))
+    return this.ast.every((val, i) => isEqual(val, other.ast[i]));
   }
 }
 
@@ -96,8 +96,8 @@ class HashMap extends MalValue {
 
   print_str(print_readably = false) {
     const str = [];
-    
-    for(const [k, v] of this.hashmap.entries()) { 
+
+    for(const [k, v] of this.hashmap.entries()) {
       const key = print_str(k, print_readably);
       const value = print_str(v, print_readably);
       str.push(`${key} ${value}`);
@@ -131,8 +131,11 @@ class Str extends MalValue {
   }
 
   print_str(print_readably = false) {
-    if (!print_readably) return this.string;
-    return `"${this.string.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n')}"`
+    if(!print_readably) return this.string;
+    return `"${this.string
+      .replace(/\\/g, '\\\\')
+      .replace(/"/g, '\\"')
+      .replace(/\n/g, '\\n')}"`;
   }
 
   isEmpty() {
@@ -144,7 +147,7 @@ class Str extends MalValue {
   }
 
   isEqual(other) {
-    return (other instanceof Str) && this.string === other.string;
+    return other instanceof Str && this.string === other.string;
   }
 }
 
@@ -167,7 +170,7 @@ class Keyword extends MalValue {
   }
 
   isEqual(other) {
-    return (other instanceof Keyword) && this.keyword === other.keyword;
+    return other instanceof Keyword && this.keyword === other.keyword;
   }
 }
 
@@ -190,7 +193,32 @@ class MalSymbol extends MalValue {
   }
 
   isEqual(other) {
-    return (other instanceof MalSymbol) && this.symbol === other.symbol;
+    return other instanceof MalSymbol && this.symbol === other.symbol;
+  }
+}
+
+class MalFunction extends MalValue {
+  constructor(ast, binds, env) {
+    super();
+    this.ast = ast;
+    this.binds = binds;
+    this.env = env;
+  }
+
+  print_str(print_readably = false) {
+    return '#<function>';
+  }
+
+  isEmpty() {
+    throw new Error(`cannot check 'empty?' for function`);
+  }
+
+  count() {
+    throw new Error(`cannot check 'count' for function`);
+  }
+
+  isEqual(other) {
+    throw new Error(`cannot check '=' for function`);
   }
 }
 
@@ -212,10 +240,22 @@ class NilValue extends MalValue {
   }
 
   isEqual(other) {
-    return (other instanceof NilValue);
+    return other instanceof NilValue;
   }
 }
 
 const Nil = new NilValue();
 
-module.exports = { MalValue, List, Vector, Nil, Str, Keyword, MalSymbol, HashMap, print_str, isEqual };
+module.exports = {
+  MalValue,
+  List,
+  Vector,
+  Nil,
+  Str,
+  Keyword,
+  MalSymbol,
+  HashMap,
+  MalFunction,
+  print_str,
+  isEqual,
+};

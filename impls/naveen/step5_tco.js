@@ -1,7 +1,7 @@
 const readline = require('readline');
 const { read_str } = require('./reader');
 const { print_str } = require('./printer');
-const { MalSymbol, List, Vector, HashMap, Nil } = require('./types');
+const { MalSymbol, List, Vector, HashMap, Nil, MalFunction } = require('./types');
 const { Env } = require('./env');
 const { coreEnv } = require('./core');
 
@@ -62,9 +62,17 @@ const EVAL = (ast, env) => {
       env = env;
       continue;
     }
-    if(symbol === 'fn*') return (...exprs) => EVAL(ast.ast[2], Env.create(env, ast.ast[1].ast, exprs));
+    if(symbol === 'fn*') {
+      return new MalFunction(ast.ast[2], ast.ast[1].ast, env);
+    }
 
-    const [fn, ...args] = eval_ast(ast, env).ast;
+    const [fn, ...args]=eval_ast(ast, env).ast;
+    
+    if(fn instanceof MalFunction) {
+      ast = fn.ast;
+      env = Env.create(env, fn.binds, args);
+      continue;
+    }
     if(!(fn instanceof Function)) throw new Error(`'${fn}' is not a function`);
 
     return fn.apply(null, args);

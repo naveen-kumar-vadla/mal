@@ -12,7 +12,7 @@ class Reader {
 
   next() {
     const token = this.peek();
-    if (this.position < this.tokens.length) this.position++;
+    if(this.position < this.tokens.length) this.position++;
     return token;
   }
 }
@@ -27,11 +27,11 @@ const tokenize = (str) => {
 
 const read_atom = (reader) => {
   const token = reader.next();
-  if (token.match(/^-?[0-9]+$/)) return parseInt(token);
-  if (token.match(/^-?[0-9][0-9.]*$/)) return parseFloat(token);
-  if (token === 'true') return true;
-  if (token === 'false') return false;
-  if (token === 'nil') return Nil;
+  if(token.match(/^-?[0-9]+$/)) return parseInt(token);
+  if(token.match(/^-?[0-9][0-9.]*$/)) return parseFloat(token);
+  if(token === 'true') return true;
+  if(token === 'false') return false;
+  if(token === 'nil') return Nil;
   if(token[0] === ':') return new Keyword(token.slice(1));
   if(token.match(/^"(?:\\.|[^\\"])*"$/)) {
     const str = token.slice(1, token.length - 1).replace(/\\(.)/g, (_, c) => c === "n" ? "\n" : c)
