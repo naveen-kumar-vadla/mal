@@ -2,20 +2,14 @@ const { Env } = require('./env');
 const { MalValue, MalSymbol, Nil, Str, List, isEqual } = require('./types');
 const { print_str } = require('./printer');
 
-const add = (...args) => {
-  if (args.length < 2) args.unshift(0);
-  return args.reduce((a, b) => a + b);
-};
+const add = (...args) => args.reduce((a, b) => a + b, 0);
 
 const subtract = (...args) => {
   if (args.length < 2) args.unshift(0);
   return args.reduce((a, b) => a - b);
 };
 
-const multiply = (...args) => {
-  if (args.length < 2) args.unshift(1);
-  return args.reduce((a, b) => a * b);
-};
+const multiply = (...args) => args.reduce((a, b) => a * b, 1);
 
 const divide = (...args) => {
   if (args.length < 2) args.unshift(1);

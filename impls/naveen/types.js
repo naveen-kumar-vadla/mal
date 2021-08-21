@@ -159,11 +159,11 @@ class Keyword extends MalValue {
   }
 
   isEmpty() {
-    throw new Error(`cannot check 'empty?' for keyword: ${this.keyword}`);
+    throw new Error(`cannot check 'empty?' for keyword: ${this.print_str()}`);
   }
 
   count() {
-    throw new Error(`cannot check 'count' for keyword: ${this.keyword}`);
+    throw new Error(`cannot check 'count' for keyword: ${this.print_str()}`);
   }
 
   isEqual(other) {
@@ -182,11 +182,11 @@ class MalSymbol extends MalValue {
   }
 
   isEmpty() {
-    throw new Error(`cannot check 'empty?' for symbol: ${this.symbol}`);
+    throw new Error(`cannot check 'empty?' for symbol: ${this.print_str()}`);
   }
 
   count() {
-    throw new Error(`cannot check 'count' for symbol: ${this.keyword}`);
+    throw new Error(`cannot check 'count' for symbol: ${this.print_str()}`);
   }
 
   isEqual(other) {
