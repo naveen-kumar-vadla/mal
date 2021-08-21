@@ -58,7 +58,9 @@ const EVAL = (ast, env) => {
     }
     if(symbol === 'if') {
       const expr = EVAL(ast.ast[1], env);
-      return (expr === Nil || expr === false) ? EVAL(ast.ast[3], env) : EVAL(ast.ast[2], env);
+      ast = (expr === Nil || expr === false) ? ast.ast[3] : ast.ast[2];
+      env = env;
+      continue;
     }
     if(symbol === 'fn*') return (...exprs) => EVAL(ast.ast[2], Env.create(env, ast.ast[1].ast, exprs));
 
