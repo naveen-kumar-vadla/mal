@@ -93,6 +93,11 @@ const makeAtom = (val) => new Atom(val);
 
 const isAtom = (val) => (val instanceof Atom);
 
+const derefAtom = (val) => {
+  if (val instanceof Atom) return val.value;
+  throw new Error(`${print_str(ast)} is not Atom`);
+};
+
 const coreEnv = new Env();
 
 coreEnv.set(new MalSymbol('+'), add);
@@ -123,5 +128,6 @@ coreEnv.set(new MalSymbol('slurp'), slurp);
 
 coreEnv.set(new MalSymbol('atom'), makeAtom);
 coreEnv.set(new MalSymbol('atom?'), isAtom);
+coreEnv.set(new MalSymbol('deref'), derefAtom);
 
 module.exports = { coreEnv };
