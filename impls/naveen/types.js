@@ -251,7 +251,7 @@ class Atom extends MalValue {
   }
 
   print_str(print_readably = false) {
-    return `Atom {:val ${print_str(this.value, print_readably)}}`;
+    return `(atom ${print_str(this.value, print_readably)})`;
   }
   
   isEmpty() {
