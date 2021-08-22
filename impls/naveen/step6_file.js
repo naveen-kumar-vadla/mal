@@ -1,7 +1,7 @@
 const readline = require('readline');
 const { read_str } = require('./reader');
 const { print_str } = require('./printer');
-const { MalSymbol, List, Vector, HashMap, Nil, MalFunction } = require('./types');
+const { MalSymbol, List, Vector, HashMap, Nil, MalFunction, Str } = require('./types');
 const { Env } = require('./env');
 const { coreEnv } = require('./core');
 
@@ -14,6 +14,7 @@ const rl = readline.createInterface(options);
 
 const env = new Env(coreEnv);
 env.set(new MalSymbol('eval'), (ast) => EVAL(ast, env));
+env.set(new MalSymbol('*ARGV*'), new List(process.argv.slice(3).map(s => new Str(s))));
 
 const eval_ast = (ast, env) => {
   if(ast instanceof MalSymbol) return env.get(ast);
