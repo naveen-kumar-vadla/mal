@@ -103,6 +103,12 @@ const resetAtom = (atom, val) => {
   throw new Error(`${print_str(atom)} is not Atom`);
 };
 
+const swapAtomValue = (atom, fn, ...params) => {
+  if (!(atom instanceof Atom)) throw new Error(`${print_str(atom)} is not Atom`);
+  const val = fn.apply(null, atom.value, ...params);
+  return atom.reset(val);
+};
+
 const coreEnv = new Env();
 
 coreEnv.set(new MalSymbol('+'), add);
@@ -135,5 +141,6 @@ coreEnv.set(new MalSymbol('atom'), makeAtom);
 coreEnv.set(new MalSymbol('atom?'), isAtom);
 coreEnv.set(new MalSymbol('deref'), derefAtom);
 coreEnv.set(new MalSymbol('reset!'), resetAtom);
+coreEnv.set(new MalSymbol('swap!'), swapAtomValue);
 
 module.exports = { coreEnv };
