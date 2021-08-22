@@ -83,7 +83,7 @@ const slurp = (ast) => {
   const filePath = print_str(ast);
   
   try {
-    return fs.readFileSync(filePath, 'utf-8');
+    return new Str(fs.readFileSync(filePath, 'utf-8'));
   } catch (e) {
     throw new Error(`File '${filePath}' not found`);
   }
@@ -105,7 +105,7 @@ const resetAtom = (atom, val) => {
 
 const swapAtomValue = (atom, fn, ...params) => {
   if (!(atom instanceof Atom)) throw new Error(`${print_str(atom)} is not Atom`);
-  const val = fn.apply(null, atom.value, ...params);
+  const val = fn.apply(null, [atom.value, ...params]);
   return atom.reset(val);
 };
 
