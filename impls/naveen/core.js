@@ -2,6 +2,7 @@ const { Env } = require('./env');
 const { MalValue, MalSymbol, Nil, Str, List, isEqual } = require('./types');
 const { print_str } = require('./printer');
 const { read_str } = require('./reader');
+const fs = require('fs');
 
 const add = (...args) => args.reduce((a, b) => a + b, 0);
 
@@ -77,6 +78,17 @@ const readString = (ast) => {
   throw new Error(`${print_str(ast)} is not String`);
 }
 
+const slurp = (ast) => {
+  if (!(ast instanceof Str)) throw new Error(`Cannot open <${print_str(ast)}> as an InputStream.`);
+  const filePath = print_str(ast);
+  
+  try {
+    return fs.readFileSync(filePath, 'utf-8');
+  } catch (e) {
+    throw new Error(`File '${filePath}' not found`);
+  }
+}
+
 const coreEnv = new Env();
 
 coreEnv.set(new MalSymbol('+'), add);
@@ -103,5 +115,6 @@ coreEnv.set(new MalSymbol('>'), isGreater);
 coreEnv.set(new MalSymbol('>='), isGreaterOrEqual);
 
 coreEnv.set(new MalSymbol('read-string'), readString);
+coreEnv.set(new MalSymbol('slurp'), slurp);
 
 module.exports = { coreEnv };
