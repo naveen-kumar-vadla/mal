@@ -13,6 +13,7 @@ const options = {
 const rl = readline.createInterface(options);
 
 const env = new Env(coreEnv);
+env.set(new MalSymbol('eval'), (ast) => EVAL(ast, env));
 
 const eval_ast = (ast, env) => {
   if(ast instanceof MalSymbol) return env.get(ast);
