@@ -1,6 +1,7 @@
 const { Env } = require('./env');
 const { MalValue, MalSymbol, Nil, Str, List, isEqual } = require('./types');
 const { print_str } = require('./printer');
+const { read_str } = require('./reader');
 
 const add = (...args) => args.reduce((a, b) => a + b, 0);
 
@@ -71,6 +72,11 @@ const isGreaterOrEqual = (...args) => {
   return args.reduce((a, b) => a >= b);
 };
 
+const readString = (ast) => {
+  if (ast instanceof Str) return read_str(ast.print_str());
+  throw new Error(`${print_str(ast)} is not String`);
+}
+
 const coreEnv = new Env();
 
 coreEnv.set(new MalSymbol('+'), add);
@@ -95,5 +101,7 @@ coreEnv.set(new MalSymbol('<'), isLesser);
 coreEnv.set(new MalSymbol('<='), isLesserOrEqual);
 coreEnv.set(new MalSymbol('>'), isGreater);
 coreEnv.set(new MalSymbol('>='), isGreaterOrEqual);
+
+coreEnv.set(new MalSymbol('read-string'), readString);
 
 module.exports = { coreEnv };
