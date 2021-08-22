@@ -71,6 +71,12 @@ const read_hashmap = (reader) => {
   return new HashMap(ast);
 };
 
+const handleAt = (reader) => {
+  reader.next();
+  const symbol = new MalSymbol('deref');
+  return new List([symbol, read_form(reader)])
+};
+
 const read_form = (reader) => {
   const token = reader.peek();
 
@@ -83,6 +89,8 @@ const read_form = (reader) => {
     
     case '{': return read_hashmap(reader);
     case '}': throw new Error(`unexpected '}'`);
+    
+    case '@': return handleAt(reader);
   }
 
   return read_atom(reader);
