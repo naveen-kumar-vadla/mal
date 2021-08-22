@@ -1,5 +1,5 @@
 const { Env } = require('./env');
-const { MalValue, MalSymbol, Nil, Str, List, isEqual } = require('./types');
+const { MalValue, MalSymbol, Nil, Str, List, isEqual, Atom } = require('./types');
 const { print_str } = require('./printer');
 const { read_str } = require('./reader');
 const fs = require('fs');
@@ -89,6 +89,8 @@ const slurp = (ast) => {
   }
 }
 
+const makeAtom = (val) => new Atom(val);
+
 const coreEnv = new Env();
 
 coreEnv.set(new MalSymbol('+'), add);
@@ -116,5 +118,7 @@ coreEnv.set(new MalSymbol('>='), isGreaterOrEqual);
 
 coreEnv.set(new MalSymbol('read-string'), readString);
 coreEnv.set(new MalSymbol('slurp'), slurp);
+
+coreEnv.set(new MalSymbol('atom'), makeAtom);
 
 module.exports = { coreEnv };

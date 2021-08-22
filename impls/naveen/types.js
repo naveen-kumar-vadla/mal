@@ -244,6 +244,30 @@ class NilValue extends MalValue {
   }
 }
 
+class Atom extends MalValue {
+  constructor(value) {
+    super();
+    this.value = value;
+  }
+
+  print_str(print_readably = false) {
+    return `Atom {:val ${print_str(this.value, print_readably)}}`;
+  }
+  
+  isEmpty() {
+    throw new Error(`cannot check 'empty?' for atom`);
+  }
+
+  count() {
+    throw new Error(`cannot check 'count' for atom`);
+  }
+
+  isEqual(other) {
+    if (!(other instanceof Atom)) return false;
+    return isEqual(this.value, other.value);
+  }
+}
+
 const Nil = new NilValue();
 
 module.exports = {
@@ -256,6 +280,7 @@ module.exports = {
   MalSymbol,
   HashMap,
   MalFunction,
+  Atom,
   print_str,
   isEqual,
 };
