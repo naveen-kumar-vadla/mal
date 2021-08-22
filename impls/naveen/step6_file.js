@@ -86,6 +86,7 @@ const rep = (str) => PRINT(EVAL(READ(str), env));
 
 rep('(def! not (fn* (x) (if x false true)))');
 rep('(def! sqrt (fn* (x) (* x x)))');
+rep('(def! load-file (fn* (f) (eval (read-string (str "(do " (slurp f) "\nnil)")))))');
 
 const main = () => {
   rl.question('user> ', (str) => {
