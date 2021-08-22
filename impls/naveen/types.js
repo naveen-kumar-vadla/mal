@@ -266,6 +266,10 @@ class Atom extends MalValue {
     if (!(other instanceof Atom)) return false;
     return isEqual(this.value, other.value);
   }
+
+  reset(value) {
+    return this.value = value;
+  }
 }
 
 const Nil = new NilValue();
