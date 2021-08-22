@@ -91,6 +91,8 @@ const slurp = (ast) => {
 
 const makeAtom = (val) => new Atom(val);
 
+const isAtom = (val) => (val instanceof Atom);
+
 const coreEnv = new Env();
 
 coreEnv.set(new MalSymbol('+'), add);
@@ -120,5 +122,6 @@ coreEnv.set(new MalSymbol('read-string'), readString);
 coreEnv.set(new MalSymbol('slurp'), slurp);
 
 coreEnv.set(new MalSymbol('atom'), makeAtom);
+coreEnv.set(new MalSymbol('atom?'), isAtom);
 
 module.exports = { coreEnv };
