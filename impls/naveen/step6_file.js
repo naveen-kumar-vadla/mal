@@ -105,4 +105,9 @@ const main = () => {
   });
 };
 
-main();
+const executeProgramFile = () => {
+  rep(`(load-file "${process.argv[2]}")`);
+  process.exit(0);
+}
+
+process.argv.length > 2 ? executeProgramFile() : main();
