@@ -198,11 +198,12 @@ class MalSymbol extends MalValue {
 }
 
 class MalFunction extends MalValue {
-  constructor(ast, binds, env) {
+  constructor(ast = null, binds = [], env = null, fn = null) {
     super();
     this.ast = ast;
     this.binds = binds;
     this.env = env;
+    this.fn = fn;
   }
 
   print_str(print_readably = false) {
@@ -219,6 +220,10 @@ class MalFunction extends MalValue {
 
   isEqual(other) {
     throw new Error(`cannot check '=' for function`);
+  }
+
+  apply(thisArg = null, params = []) {
+    return this.fn.apply(thisArg, params);
   }
 }
 

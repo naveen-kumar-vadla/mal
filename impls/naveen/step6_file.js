@@ -65,10 +65,12 @@ const EVAL = (ast, env) => {
       continue;
     }
     if(symbol === 'fn*') {
-      return new MalFunction(ast.ast[2], ast.ast[1].ast, env);
+      const fnAst = ast.ast[2];
+      const fnBinds = ast.ast[1].ast;
+      return new MalFunction(fnAst, fnBinds, env, (...exprs) => EVAL(fnAst, Env.create(env, fnBinds, exprs)));
     }
 
-    const [fn, ...args]=eval_ast(ast, env).ast;
+    const [fn, ...args] = eval_ast(ast, env).ast;
     
     if(fn instanceof MalFunction) {
       ast = fn.ast;
