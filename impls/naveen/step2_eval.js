@@ -20,16 +20,16 @@ const env = {
 };
 
 const eval_ast = (ast, env) => {
-  if(ast instanceof MalSymbol) {
+  if (ast instanceof MalSymbol) {
     const val = env[ast.symbol];
-    if(val) return val;
+    if (val) return val;
     throw new Error(`symbol '${ast.symbol}' not found`);
   }
-  if(ast instanceof List) return new List(ast.ast.map(x => EVAL(x, env)));
-  if(ast instanceof Vector) return new Vector(ast.ast.map(x => EVAL(x, env)));
-  if(ast instanceof HashMap) {
+  if (ast instanceof List) return new List(ast.ast.map(x => EVAL(x, env)));
+  if (ast instanceof Vector) return new Vector(ast.ast.map(x => EVAL(x, env)));
+  if (ast instanceof HashMap) {
     const newAst = [];
-    for(const [key, value] of ast.hashmap.entries()) newAst.push(EVAL(key, env), EVAL(value, env));
+    for (const [key, value] of ast.hashmap.entries()) newAst.push(EVAL(key, env), EVAL(value, env));
     return new HashMap(newAst);
   }
 
@@ -39,11 +39,11 @@ const eval_ast = (ast, env) => {
 const READ = (str) => read_str(str);
 
 const EVAL = (ast, env) => {
-  if(!(ast instanceof List)) return eval_ast(ast, env);
-  if(ast.isEmpty()) return ast;
+  if (!(ast instanceof List)) return eval_ast(ast, env);
+  if (ast.isEmpty()) return ast;
 
   const [fn, ...args] = eval_ast(ast, env).ast;
-  if(!(fn instanceof Function)) throw new Error(`'${fn}' is not a function`);
+  if (!(fn instanceof Function)) throw new Error(`'${fn}' is not a function`);
 
   return fn.apply(null, args);
 }
@@ -56,8 +56,8 @@ const main = () => {
   rl.question('user> ', (str) => {
     try {
       console.log(rep(str));
-    } 
-    catch(e) {
+    }
+    catch (e) {
       console.log(e.message);
     }
     finally {

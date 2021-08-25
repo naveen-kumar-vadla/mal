@@ -12,7 +12,7 @@ class Reader {
 
   next() {
     const token = this.peek();
-    if(this.position < this.tokens.length) this.position++;
+    if (this.position < this.tokens.length) this.position++;
     return token;
   }
 }
@@ -20,24 +20,24 @@ class Reader {
 const tokenize = (str) => {
   const regEx = /[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`,;)]*)/g;
   return [...str.matchAll(regEx)]
-      .map((x) => x[1])
-      .filter(x => x[0] !== ';')
-      .slice(0, -1);
+    .map((x) => x[1])
+    .filter(x => x[0] !== ';')
+    .slice(0, -1);
 };
 
 const read_atom = (reader) => {
   const token = reader.next();
-  if(token.match(/^-?[0-9]+$/)) return parseInt(token);
-  if(token.match(/^-?[0-9][0-9.]*$/)) return parseFloat(token);
-  if(token === 'true') return true;
-  if(token === 'false') return false;
-  if(token === 'nil') return Nil;
-  if(token[0] === ':') return new Keyword(token.slice(1));
-  if(token.match(/^"(?:\\.|[^\\"])*"$/)) {
+  if (token.match(/^-?[0-9]+$/)) return parseInt(token);
+  if (token.match(/^-?[0-9][0-9.]*$/)) return parseFloat(token);
+  if (token === 'true') return true;
+  if (token === 'false') return false;
+  if (token === 'nil') return Nil;
+  if (token[0] === ':') return new Keyword(token.slice(1));
+  if (token.match(/^"(?:\\.|[^\\"])*"$/)) {
     const str = token.slice(1, token.length - 1).replace(/\\(.)/g, (_, c) => c === "n" ? "\n" : c)
     return new Str(str);
   }
-  if(token[0] === '"') throw new Error(`expected '"', got end of input`);
+  if (token[0] === '"') throw new Error(`expected '"', got end of input`);
 
   return new MalSymbol(token);
 };
@@ -47,7 +47,7 @@ const read_seq = (reader, closingCharacter) => {
   reader.next();
 
   while (reader.peek() !== closingCharacter) {
-    if(reader.peek() === undefined) throw new Error(`expected '${closingCharacter}', got end of input`);
+    if (reader.peek() === undefined) throw new Error(`expected '${closingCharacter}', got end of input`);
     ast.push(read_form(reader));
   }
 
@@ -67,7 +67,7 @@ const read_vector = (reader) => {
 
 const read_hashmap = (reader) => {
   const ast = read_seq(reader, '}');
-  if(ast.length % 2 !== 0) throw new Error('Odd number of hash map arguments');
+  if (ast.length % 2 !== 0) throw new Error('Odd number of hash map arguments');
   return new HashMap(ast);
 };
 
@@ -84,13 +84,13 @@ const read_form = (reader) => {
   switch (token[0]) {
     case '(': return read_list(reader);
     case ')': throw new Error(`unexpected ')'`);
-    
+
     case '[': return read_vector(reader);
     case ']': throw new Error(`unexpected ']'`);
-    
+
     case '{': return read_hashmap(reader);
     case '}': throw new Error(`unexpected '}'`);
-    
+
     case '@': return handleAt(reader);
   }
 

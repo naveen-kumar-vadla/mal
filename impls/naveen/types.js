@@ -1,12 +1,12 @@
 const print_str = (ast, print_readably) => {
-  if(ast instanceof MalValue) return ast.print_str(print_readably);
+  if (ast instanceof MalValue) return ast.print_str(print_readably);
   return ast.toString();
 };
 
 const isEqual = (...args) => {
   const firstElement = args[0];
   let comparator = (x) => x === firstElement;
-  if(firstElement instanceof MalValue) comparator = (x) => firstElement.isEqual(x);
+  if (firstElement instanceof MalValue) comparator = (x) => firstElement.isEqual(x);
 
   return args.slice(1).every(comparator);
 };
@@ -54,7 +54,7 @@ class List extends MalValue {
   }
 
   isEqual(other) {
-    if((!(other instanceof List) && !(other instanceof Vector)) || other.count() !== this.count()) {
+    if ((!(other instanceof List) && !(other instanceof Vector)) || other.count() !== this.count()) {
       return false;
     }
 
@@ -86,7 +86,7 @@ class Vector extends MalValue {
   }
 
   isEqual(other) {
-    if((!(other instanceof List) && !(other instanceof Vector)) || other.count() !== this.count()) {
+    if ((!(other instanceof List) && !(other instanceof Vector)) || other.count() !== this.count()) {
       return false;
     }
 
@@ -108,7 +108,7 @@ class HashMap extends MalValue {
   }
 
   initialiseHashMap() {
-    for(let i = 0; i < this.ast.length; i += 2) {
+    for (let i = 0; i < this.ast.length; i += 2) {
       this.hashmap.set(this.ast[i], this.ast[i + 1]);
     }
   }
@@ -116,7 +116,7 @@ class HashMap extends MalValue {
   print_str(print_readably = false) {
     const str = [];
 
-    for(const [k, v] of this.hashmap.entries()) {
+    for (const [k, v] of this.hashmap.entries()) {
       const key = print_str(k, print_readably);
       const value = print_str(v, print_readably);
       str.push(`${key} ${value}`);
@@ -134,17 +134,17 @@ class HashMap extends MalValue {
   }
 
   isEqual(other) {
-    if(!(other instanceof HashMap) || other.hashmap.size !== this.hashmap.size) {
+    if (!(other instanceof HashMap) || other.hashmap.size !== this.hashmap.size) {
       return false;
     }
 
     const keys = [...this.hashmap.keys()];
     return keys.every(key => isEqual(this.hashmap.get(key), other.hashmap.get(key)));
   }
-  
+
   clone() {
     const newAst = [];
-    for(const [key, value] of this.ast.hashmap.entries()) newAst.push(clone(key), clone(value));
+    for (const [key, value] of this.ast.hashmap.entries()) newAst.push(clone(key), clone(value));
     return new HashMap(newAst);
   }
 }
@@ -156,7 +156,7 @@ class Str extends MalValue {
   }
 
   print_str(print_readably = false) {
-    if(!print_readably) return this.string;
+    if (!print_readably) return this.string;
     return `"${this.string
       .replace(/\\/g, '\\\\')
       .replace(/"/g, '\\"')
@@ -303,7 +303,7 @@ class Atom extends MalValue {
   print_str(print_readably = false) {
     return `(atom ${print_str(this.value, print_readably)})`;
   }
-  
+
   isEmpty() {
     throw new Error(`cannot check 'empty?' for atom`);
   }

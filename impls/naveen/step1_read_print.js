@@ -19,8 +19,8 @@ const main = () => {
   rl.question('user> ', (str) => {
     try {
       console.log(rep(str));
-    } 
-    catch(e) {
+    }
+    catch (e) {
       console.log(e.message);
     }
     finally {
