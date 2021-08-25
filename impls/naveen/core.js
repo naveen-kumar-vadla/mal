@@ -7,19 +7,19 @@ const fs = require('fs');
 const add = (...args) => args.reduce((a, b) => a + b, 0);
 
 const subtract = (...args) => {
-  if(args.length < 2) args.unshift(0);
+  if (args.length < 2) args.unshift(0);
   return args.reduce((a, b) => a - b);
 };
 
 const multiply = (...args) => args.reduce((a, b) => a * b, 1);
 
 const divide = (...args) => {
-  if(args.length < 2) args.unshift(1);
+  if (args.length < 2) args.unshift(1);
   return args.reduce((a, b) => a / b);
 };
 
 const remainder = (...args) => {
-  if(args.length < 2) args.unshift(0);
+  if (args.length < 2) args.unshift(0);
   return args.reduce((a, b) => a % b);
 };
 
@@ -42,50 +42,50 @@ const makeList = (...args) => new List(args);
 const isList = (list) => (list instanceof List) || (Array.isArray(list));
 
 const isEmpty = (ast) => {
-  if(ast instanceof MalValue) return ast.isEmpty();
-  if(ast.length !== undefined) return ast.length === 0;
+  if (ast instanceof MalValue) return ast.isEmpty();
+  if (ast.length !== undefined) return ast.length === 0;
   throw new Error(`cannot check 'empty?' for ${print_str(ast)}`);
 };
 
 const count = (ast) => {
-  if(ast instanceof MalValue) return ast.count();
-  if(ast.length !== undefined) return ast.length;
+  if (ast instanceof MalValue) return ast.count();
+  if (ast.length !== undefined) return ast.length;
   throw new Error(`cannot check 'count' for ${print_str(ast)}`);
 };
 
 const isLesser = (...args) => {
-  if(args.length < 2) args.unshift(-Infinity);
+  if (args.length < 2) args.unshift(-Infinity);
   return args.reduce((a, b) => a < b);
 };
 
 const isLesserOrEqual = (...args) => {
-  if(args.length < 2) args.unshift(-Infinity);
+  if (args.length < 2) args.unshift(-Infinity);
   return args.reduce((a, b) => a <= b);
 };
 
 const isGreater = (...args) => {
-  if(args.length < 2) args.unshift(Infinity);
+  if (args.length < 2) args.unshift(Infinity);
   return args.reduce((a, b) => a > b);
 };
 
 const isGreaterOrEqual = (...args) => {
-  if(args.length < 2) args.unshift(Infinity);
+  if (args.length < 2) args.unshift(Infinity);
   return args.reduce((a, b) => a >= b);
 };
 
 const readString = (ast) => {
   if (ast instanceof Str) return read_str(ast.print_str());
-  throw new Error(`${print_str(ast)} is not String`);
+  throw new Error(`${print_str(ast)} is not a String`);
 }
 
 const slurp = (ast) => {
-  if (!(ast instanceof Str)) throw new Error(`Cannot open <${print_str(ast)}> as an InputStream.`);
+  if (!(ast instanceof Str)) throw new Error(`cannot open <${print_str(ast)}> as an InputStream.`);
   const filePath = ast.print_str();
-  
+
   try {
     return new Str(fs.readFileSync(filePath, 'utf-8'));
   } catch (e) {
-    throw new Error(`File '${filePath}' not found`);
+    throw new Error(`file '${filePath}' not found`);
   }
 }
 
@@ -95,27 +95,31 @@ const isAtom = (val) => (val instanceof Atom);
 
 const derefAtom = (val) => {
   if (val instanceof Atom) return val.value;
-  throw new Error(`${print_str(val)} is not Atom`);
+  throw new Error(`${print_str(val)} is not an Atom`);
 };
 
 const resetAtom = (atom, val) => {
   if (atom instanceof Atom) return atom.reset(val);
-  throw new Error(`${print_str(atom)} is not Atom`);
+  throw new Error(`${print_str(atom)} is not an Atom`);
 };
 
 const swapAtomValue = (atom, fn, ...params) => {
-  if (!(atom instanceof Atom)) throw new Error(`${print_str(atom)} is not Atom`);
+  if (!(atom instanceof Atom)) throw new Error(`${print_str(atom)} is not an Atom`);
   const val = fn.apply(null, [atom.value, ...params]);
   return atom.reset(val);
 };
 
 const constructNewList = (firstElement, list) => {
+  if (!(list instanceof List)) throw new Error(`${print_str(list)} is not a List`);
   const clonedList = list.clone();
   return new List([firstElement, ...clonedList.ast]);
 };
 
 const concatenateLists = (...lists) => {
-  const newAst = lists.reduce((ast, list) => ast.concat(list.clone().ast), []);
+  const newAst = lists.reduce((ast, list) => {
+    if (!(list instanceof List)) throw new Error(`${print_str(list)} is not a List`);
+    return ast.concat(list.clone().ast)
+  }, []);
   return new List(newAst);
 };
 
