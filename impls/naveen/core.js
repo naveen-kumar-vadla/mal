@@ -109,6 +109,11 @@ const swapAtomValue = (atom, fn, ...params) => {
   return atom.reset(val);
 };
 
+const constructNewList = (firstElement, list) => {
+  const clonedList = list.clone();
+  return new List([firstElement, ...clonedList.ast]);
+};
+
 const coreEnv = new Env();
 
 coreEnv.set(new MalSymbol('+'), add);
@@ -142,5 +147,7 @@ coreEnv.set(new MalSymbol('atom?'), isAtom);
 coreEnv.set(new MalSymbol('deref'), derefAtom);
 coreEnv.set(new MalSymbol('reset!'), resetAtom);
 coreEnv.set(new MalSymbol('swap!'), swapAtomValue);
+
+coreEnv.set(new MalSymbol('cons'), constructNewList);
 
 module.exports = { coreEnv };
