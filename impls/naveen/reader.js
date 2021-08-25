@@ -79,6 +79,7 @@ const handleAt = (reader) => {
 
 const read_form = (reader) => {
   const token = reader.peek();
+  if (token === undefined) return Nil;
 
   switch (token[0]) {
     case '(': return read_list(reader);

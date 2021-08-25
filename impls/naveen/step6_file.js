@@ -74,7 +74,7 @@ const EVAL = (ast, env) => {
     
     if(fn instanceof MalFunction) {
       ast = fn.ast;
-      env = Env.create(env, fn.binds, args);
+      env = Env.create(fn.env, fn.binds, args);
       continue;
     }
     if(!(fn instanceof Function)) throw new Error(`'${fn}' is not a function`);
@@ -106,8 +106,15 @@ const main = () => {
 };
 
 const executeProgramFile = () => {
-  rep(`(load-file "${process.argv[2]}")`);
-  process.exit(0);
+  try {
+    rep(`(load-file "${process.argv[2]}")`);
+  } 
+  catch(e) {
+    console.log(e.message);
+  }
+  finally {
+    process.exit(0);
+  }
 }
 
 process.argv.length > 2 ? executeProgramFile() : main();

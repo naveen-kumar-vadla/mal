@@ -223,7 +223,7 @@ class MalFunction extends MalValue {
   }
 
   apply(thisArg = null, params = []) {
-    return this.fn.apply(thisArg, params);
+    return this.fn && this.fn.apply(thisArg, params);
   }
 }
 

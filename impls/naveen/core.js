@@ -80,7 +80,7 @@ const readString = (ast) => {
 
 const slurp = (ast) => {
   if (!(ast instanceof Str)) throw new Error(`Cannot open <${print_str(ast)}> as an InputStream.`);
-  const filePath = print_str(ast);
+  const filePath = ast.print_str();
   
   try {
     return new Str(fs.readFileSync(filePath, 'utf-8'));
