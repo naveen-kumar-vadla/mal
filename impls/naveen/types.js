@@ -11,6 +11,12 @@ const isEqual = (...args) => {
   return args.slice(1).every(comparator);
 };
 
+const clone = (ast) => {
+  if (ast instanceof MalValue) return ast.clone();
+  if (Array.isArray(ast)) return ast.slice();
+  return ast;
+};
+
 class MalValue {
   print_str(print_readably = false) {
     return 'default MalValue';
@@ -23,6 +29,9 @@ class MalValue {
   }
   count() {
     return 0;
+  }
+  clone() {
+    return new MalValue();
   }
 }
 
@@ -51,6 +60,11 @@ class List extends MalValue {
 
     return this.ast.every((val, i) => isEqual(val, other.ast[i]));
   }
+
+  clone() {
+    const ast = this.ast.map(clone);
+    return new List(ast);
+  }
 }
 
 class Vector extends MalValue {
@@ -77,6 +91,11 @@ class Vector extends MalValue {
     }
 
     return this.ast.every((val, i) => isEqual(val, other.ast[i]));
+  }
+
+  clone() {
+    const ast = this.ast.map(clone);
+    return new Vector(ast);
   }
 }
 
@@ -122,6 +141,12 @@ class HashMap extends MalValue {
     const keys = [...this.hashmap.keys()];
     return keys.every(key => isEqual(this.hashmap.get(key), other.hashmap.get(key)));
   }
+  
+  clone() {
+    const newAst = [];
+    for(const [key, value] of this.ast.hashmap.entries()) newAst.push(clone(key), clone(value));
+    return new HashMap(newAst);
+  }
 }
 
 class Str extends MalValue {
@@ -149,6 +174,10 @@ class Str extends MalValue {
   isEqual(other) {
     return other instanceof Str && this.string === other.string;
   }
+
+  clone() {
+    return new Str(this.string);
+  }
 }
 
 class Keyword extends MalValue {
@@ -172,6 +201,10 @@ class Keyword extends MalValue {
   isEqual(other) {
     return other instanceof Keyword && this.keyword === other.keyword;
   }
+
+  clone() {
+    return new Keyword(this.keyword);
+  }
 }
 
 class MalSymbol extends MalValue {
@@ -194,6 +227,10 @@ class MalSymbol extends MalValue {
 
   isEqual(other) {
     return other instanceof MalSymbol && this.symbol === other.symbol;
+  }
+
+  clone() {
+    return new MalSymbol(this.symbol);
   }
 }
 
@@ -225,6 +262,10 @@ class MalFunction extends MalValue {
   apply(thisArg = null, params = []) {
     return this.fn && this.fn.apply(thisArg, params);
   }
+
+  clone() {
+    return new MalFunction(clone(this.ast), this.binds, this.env, this.fn);
+  }
 }
 
 class NilValue extends MalValue {
@@ -246,6 +287,10 @@ class NilValue extends MalValue {
 
   isEqual(other) {
     return other instanceof NilValue;
+  }
+
+  clone() {
+    return new NilValue();
   }
 }
 
@@ -275,6 +320,10 @@ class Atom extends MalValue {
   reset(value) {
     return this.value = value;
   }
+
+  clone() {
+    return new Atom(clone(this.value));
+  }
 }
 
 const Nil = new NilValue();
@@ -292,4 +341,5 @@ module.exports = {
   Atom,
   print_str,
   isEqual,
+  clone
 };
