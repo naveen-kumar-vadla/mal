@@ -114,6 +114,11 @@ const constructNewList = (firstElement, list) => {
   return new List([firstElement, ...clonedList.ast]);
 };
 
+const concatenateLists = (...lists) => {
+  const newAst = lists.reduce((ast, list) => ast.concat(list.clone().ast), []);
+  return new List(newAst);
+};
+
 const coreEnv = new Env();
 
 coreEnv.set(new MalSymbol('+'), add);
@@ -149,5 +154,6 @@ coreEnv.set(new MalSymbol('reset!'), resetAtom);
 coreEnv.set(new MalSymbol('swap!'), swapAtomValue);
 
 coreEnv.set(new MalSymbol('cons'), constructNewList);
+coreEnv.set(new MalSymbol('concat'), concatenateLists);
 
 module.exports = { coreEnv };
