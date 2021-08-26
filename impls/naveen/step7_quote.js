@@ -95,6 +95,7 @@ const EVAL = (ast, env) => {
       return new MalFunction(fnAst, fnBinds, env, (...exprs) => EVAL(fnAst, Env.create(env, fnBinds, exprs)));
     }
     if (symbol === 'quote') return ast.ast[1];
+    if (symbol === 'quasiquoteexpand') return quasiquote(ast.ast[1]);
     if (symbol === 'quasiquote') {
       ast = quasiquote(ast.ast[1]);
       continue;
