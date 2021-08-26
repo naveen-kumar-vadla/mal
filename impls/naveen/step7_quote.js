@@ -48,6 +48,7 @@ const populate = (ast) => {
 
 const quasiquote = (ast) => {
   if ((ast instanceof HashMap) || (ast instanceof MalSymbol)) return new List([new MalSymbol('quote'), ast]);
+  if (ast instanceof Vector) return new List([new MalSymbol('vec'), populate(ast)]);
   if (ast instanceof List) {
     const firstElement = ast.ast[0];
     if ((firstElement instanceof MalSymbol) && firstElement.symbol === 'unquote') return ast.ast[1];
