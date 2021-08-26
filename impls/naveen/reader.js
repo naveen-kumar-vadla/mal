@@ -71,9 +71,9 @@ const read_hashmap = (reader) => {
   return new HashMap(ast);
 };
 
-const handleAt = (reader) => {
+const handleSplSymbol = (reader, symbolName) => {
   reader.next();
-  const symbol = new MalSymbol('deref');
+  const symbol = new MalSymbol(symbolName);
   return new List([symbol, read_form(reader)])
 };
 
@@ -91,7 +91,8 @@ const read_form = (reader) => {
     case '{': return read_hashmap(reader);
     case '}': throw new Error(`unexpected '}'`);
 
-    case '@': return handleAt(reader);
+    case '@': return handleSplSymbol(reader, 'deref');
+    case '\'': return handleSplSymbol(reader, 'quote');
   }
 
   return read_atom(reader);
