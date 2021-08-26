@@ -81,7 +81,7 @@ const read_form = (reader) => {
   const token = reader.peek();
   if (token === undefined) return Nil;
 
-  switch (token[0]) {
+  switch (token) {
     case '(': return read_list(reader);
     case ')': throw new Error(`unexpected ')'`);
 
