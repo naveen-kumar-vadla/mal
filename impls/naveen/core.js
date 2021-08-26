@@ -123,6 +123,12 @@ const concatenateLists = (...lists) => {
   return new List(newAst);
 };
 
+const listToVector = (list) => {
+  if (list instanceof List) return new Vector(list.clone().ast);
+  if (list instanceof Vector) return list;
+  throw new Error(`${print_str(list)} is not a List/Vector`);
+};
+
 const coreEnv = new Env();
 
 coreEnv.set(new MalSymbol('+'), add);
@@ -159,5 +165,7 @@ coreEnv.set(new MalSymbol('swap!'), swapAtomValue);
 
 coreEnv.set(new MalSymbol('cons'), constructNewList);
 coreEnv.set(new MalSymbol('concat'), concatenateLists);
+
+coreEnv.set(new MalSymbol('vec'), listToVector);
 
 module.exports = { coreEnv };
