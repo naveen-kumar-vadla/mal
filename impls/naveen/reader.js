@@ -93,6 +93,7 @@ const read_form = (reader) => {
 
     case '@': return handleSplSymbol(reader, 'deref');
     case '\'': return handleSplSymbol(reader, 'quote');
+    case '`': return handleSplSymbol(reader, 'quasiquote');
   }
 
   return read_atom(reader);
