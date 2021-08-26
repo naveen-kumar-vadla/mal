@@ -1,5 +1,5 @@
 const { Env } = require('./env');
-const { MalValue, MalSymbol, Nil, Str, List, isEqual, Atom } = require('./types');
+const { MalValue, MalSymbol, Nil, Str, List, isEqual, Atom, Vector } = require('./types');
 const { print_str } = require('./printer');
 const { read_str } = require('./reader');
 const fs = require('fs');
@@ -110,14 +110,14 @@ const swapAtomValue = (atom, fn, ...params) => {
 };
 
 const constructNewList = (firstElement, list) => {
-  if (!(list instanceof List)) throw new Error(`${print_str(list)} is not a List`);
+  if (!(list instanceof List) && !(list instanceof Vector)) throw new Error(`${print_str(list)} is not a List/Vector`);
   const clonedList = list.clone();
   return new List([firstElement, ...clonedList.ast]);
 };
 
 const concatenateLists = (...lists) => {
   const newAst = lists.reduce((ast, list) => {
-    if (!(list instanceof List)) throw new Error(`${print_str(list)} is not a List`);
+    if (!(list instanceof List) && !(list instanceof Vector)) throw new Error(`${print_str(list)} is not a List/Vector`);
     return ast.concat(list.clone().ast)
   }, []);
   return new List(newAst);
