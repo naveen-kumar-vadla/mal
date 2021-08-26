@@ -69,6 +69,7 @@ const EVAL = (ast, env) => {
       const fnBinds = ast.ast[1].ast;
       return new MalFunction(fnAst, fnBinds, env, (...exprs) => EVAL(fnAst, Env.create(env, fnBinds, exprs)));
     }
+    if (symbol === 'quote') return ast.ast[1];
 
     const [fn, ...args] = eval_ast(ast, env).ast;
 
