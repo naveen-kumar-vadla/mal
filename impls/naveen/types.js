@@ -35,14 +35,14 @@ class MalValue {
   }
 }
 
-class List extends MalValue {
+class MalSequence extends MalValue {
   constructor(ast) {
     super();
     this.ast = ast;
   }
 
   print_str(print_readably = false) {
-    return `(${this.ast.map(x => print_str(x, print_readably)).join(' ')})`;
+    return `(seq ${this.ast.map(x => print_str(x, print_readably)).join(' ')})`;
   }
 
   isEmpty() {
@@ -53,8 +53,8 @@ class List extends MalValue {
     return this.ast.length;
   }
 
-  isEqual(other) {
-    if ((!(other instanceof List) && !(other instanceof Vector)) || other.count() !== this.count()) {
+  isEqual(other = null) {
+    if (!(other instanceof MalSequence) || other.count() !== this.count()) {
       return false;
     }
 
@@ -63,34 +63,32 @@ class List extends MalValue {
 
   clone() {
     const ast = this.ast.map(clone);
+    return new MalSequence(ast);
+  }
+}
+
+class List extends MalSequence {
+  constructor(ast) {
+    super(ast);
+  }
+
+  print_str(print_readably = false) {
+    return `(${this.ast.map(x => print_str(x, print_readably)).join(' ')})`;
+  }
+
+  clone() {
+    const ast = this.ast.map(clone);
     return new List(ast);
   }
 }
 
-class Vector extends MalValue {
+class Vector extends MalSequence {
   constructor(ast) {
-    super();
-    this.ast = ast;
+    super(ast);
   }
 
   print_str(print_readably = false) {
     return `[${this.ast.map(x => print_str(x, print_readably)).join(' ')}]`;
-  }
-
-  isEmpty() {
-    return this.ast.length === 0;
-  }
-
-  count() {
-    return this.ast.length;
-  }
-
-  isEqual(other) {
-    if ((!(other instanceof List) && !(other instanceof Vector)) || other.count() !== this.count()) {
-      return false;
-    }
-
-    return this.ast.every((val, i) => isEqual(val, other.ast[i]));
   }
 
   clone() {
@@ -104,10 +102,10 @@ class HashMap extends MalValue {
     super();
     this.ast = ast;
     this.hashmap = new Map();
-    this.initialiseHashMap();
+    this.initializeHashMap();
   }
 
-  initialiseHashMap() {
+  initializeHashMap() {
     for (let i = 0; i < this.ast.length; i += 2) {
       this.hashmap.set(this.ast[i], this.ast[i + 1]);
     }
@@ -335,6 +333,7 @@ const Nil = new NilValue();
 
 module.exports = {
   MalValue,
+  MalSequence,
   List,
   Vector,
   Nil,
