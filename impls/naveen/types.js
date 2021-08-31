@@ -65,6 +65,15 @@ class MalSequence extends MalValue {
     const ast = this.ast.map(clone);
     return new MalSequence(ast);
   }
+
+  nth(index = -1) {
+    if(index < 0 || index >= this.ast.length) throw new Error(`nth: ${index} - index out of range`);
+    return this.ast[index];
+  }
+
+  rest(index = -1) {
+    return new List(this.ast.slice().filter((_, i) => i !== index));
+  }
 }
 
 class List extends MalSequence {

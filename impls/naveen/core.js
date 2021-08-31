@@ -129,6 +129,26 @@ const listToVector = (list) => {
   throw new Error(`${print_str(list)} is not a List/Vector`);
 };
 
+const nth = (list, index) => {
+  if (!(list instanceof MalSequence)) throw new Error(`${print_str(list)} is not a List/Vector`);
+  return list.nth(index);
+};
+
+const first = (list) => {
+  if (list === Nil) return Nil;
+  if (!(list instanceof MalSequence)) throw new Error(`${print_str(list)} is not a List/Vector`);
+  if (list.isEmpty()) return Nil;
+  return list.nth(0);
+};
+
+const rest = (list) => {
+  const emptyList = new List([]);
+  if (list === Nil) return emptyList;
+  if (!(list instanceof MalSequence)) throw new Error(`${print_str(list)} is not a List/Vector`);
+  if (list.isEmpty()) return emptyList;
+  return list.rest(0);
+};
+
 const coreEnv = new Env();
 
 coreEnv.set(new MalSymbol('+'), add);
@@ -167,5 +187,9 @@ coreEnv.set(new MalSymbol('cons'), constructNewList);
 coreEnv.set(new MalSymbol('concat'), concatenateLists);
 
 coreEnv.set(new MalSymbol('vec'), listToVector);
+
+coreEnv.set(new MalSymbol('nth'), nth);
+coreEnv.set(new MalSymbol('first'), first);
+coreEnv.set(new MalSymbol('rest'), rest);
 
 module.exports = { coreEnv };

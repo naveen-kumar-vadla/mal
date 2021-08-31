@@ -59,6 +59,7 @@ const quasiquote = (ast) => {
 
 const isMacro = (ast, env) => {
   if (!(ast instanceof List)) return false;
+  if (ast.isEmpty()) return false;
   const firstElt = ast.ast[0];
   const firstEltValue = env.find(firstElt) && env.get(firstElt);
   return firstElt instanceof MalSymbol && (firstEltValue instanceof MalFunction) && firstEltValue.is_macro;
