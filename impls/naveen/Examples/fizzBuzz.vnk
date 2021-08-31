@@ -1,0 +1,25 @@
+(def! fizz-buzz
+  (fn* (n)
+    (if (= 0 (% n 15)) :fizz-buzz 
+      (if (= 0 (% n 5)) :buzz 
+        (if (= 0 (% n 3)) :fizz n)
+      )
+    )
+  )
+)
+
+(prn (fizz-buzz 1))
+(prn (fizz-buzz 2))
+(prn (fizz-buzz 3))
+(prn (fizz-buzz 4))
+(prn (fizz-buzz 5))
+(prn (fizz-buzz 6))
+(prn (fizz-buzz 7))
+(prn (fizz-buzz 8))
+(prn (fizz-buzz 9))
+(prn (fizz-buzz 10))
+(prn (fizz-buzz 11))
+(prn (fizz-buzz 12))
+(prn (fizz-buzz 13))
+(prn (fizz-buzz 14))
+(prn (fizz-buzz 15))
