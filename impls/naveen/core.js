@@ -39,17 +39,15 @@ const str = (...args) => new Str(args.map(x => print_str(x, false)).join(''));
 
 const makeList = (...args) => new List(args);
 
-const isList = (list) => (list instanceof List) || (Array.isArray(list));
+const isList = (list) => list instanceof List;
 
 const isEmpty = (ast) => {
   if (ast instanceof MalValue) return ast.isEmpty();
-  if (ast.length !== undefined) return ast.length === 0;
   throw new Error(`cannot check 'empty?' for ${print_str(ast)}`);
 };
 
 const count = (ast) => {
   if (ast instanceof MalValue) return ast.count();
-  if (ast.length !== undefined) return ast.length;
   throw new Error(`cannot check 'count' for ${print_str(ast)}`);
 };
 
