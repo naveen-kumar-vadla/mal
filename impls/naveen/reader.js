@@ -71,10 +71,11 @@ const read_hashmap = (reader) => {
   return new HashMap(ast);
 };
 
-const handleSplSymbol = (reader, symbolName) => {
+const prepend_symbol = (reader, symbolName) => {
   reader.next();
   const symbol = new MalSymbol(symbolName);
-  return new List([symbol, read_form(reader)])
+  const newAst = read_form(reader);
+  return new List([symbol, newAst])
 };
 
 const read_form = (reader) => {
@@ -91,11 +92,11 @@ const read_form = (reader) => {
     case '{': return read_hashmap(reader);
     case '}': throw new Error(`unexpected '}'`);
 
-    case '@': return handleSplSymbol(reader, 'deref');
-    case '\'': return handleSplSymbol(reader, 'quote');
-    case '`': return handleSplSymbol(reader, 'quasiquote');
-    case '~': return handleSplSymbol(reader, 'unquote');
-    case '~@': return handleSplSymbol(reader, 'splice-unquote');
+    case '@': return prepend_symbol(reader, 'deref');
+    case '\'': return prepend_symbol(reader, 'quote');
+    case '`': return prepend_symbol(reader, 'quasiquote');
+    case '~': return prepend_symbol(reader, 'unquote');
+    case '~@': return prepend_symbol(reader, 'splice-unquote');
   }
 
   return read_atom(reader);

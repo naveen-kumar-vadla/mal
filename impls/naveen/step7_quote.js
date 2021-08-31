@@ -34,7 +34,7 @@ const READ = (str) => read_str(str);
 const populate = (ast) => {
   let result = new List([]);
 
-  for (let i = ast.ast.length - 1; i >= 0; i--) {
+  for (let i = ast.count() - 1; i >= 0; i--) {
     const elt = ast.ast[i];
     if (elt instanceof List && elt.ast[0] instanceof MalSymbol && elt.ast[0].symbol === 'splice-unquote') {
       result = new List([new MalSymbol('concat'), elt.ast[1], result]);
@@ -81,13 +81,11 @@ const EVAL = (ast, env) => {
     if (symbol === 'do') {
       ast.ast.slice(1, -1).forEach(form => EVAL(form, env));
       ast = ast.ast[ast.ast.length - 1];
-      env = env;
       continue;
     }
     if (symbol === 'if') {
       const expr = EVAL(ast.ast[1], env);
       ast = (expr === Nil || expr === false) ? ast.ast[3] : ast.ast[2];
-      env = env;
       continue;
     }
     if (symbol === 'fn*') {

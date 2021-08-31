@@ -1,8 +1,8 @@
+const fs = require('fs');
 const { Env } = require('./env');
 const { MalValue, MalSymbol, Nil, Str, List, isEqual, Atom, Vector } = require('./types');
 const { print_str } = require('./printer');
 const { read_str } = require('./reader');
-const fs = require('fs');
 
 const add = (...args) => args.reduce((a, b) => a + b, 0);
 
