@@ -57,9 +57,27 @@ const quasiquote = (ast) => {
   return ast;
 };
 
+const isMacro = (ast, env) => {
+  if (!(ast instanceof List)) return false;
+  const firstElt = ast.ast[0];
+  const firstEltValue = env.find(firstElt) && env.get(firstElt);
+  return firstElt instanceof MalSymbol && (firstEltValue instanceof MalFunction) && firstEltValue.is_macro;
+};
+
+const macroExpand = (ast, env) => {
+  while (isMacro(ast, env)) {
+    const macro = env.get(ast.ast[0]);
+    ast = macro.apply(null, ast.ast.slice(1));
+  }
+  return ast;
+};
+
 const EVAL = (ast, env) => {
   while (true) {
     if (ast === undefined) return Nil;
+
+    ast = macroExpand(ast, env);
+
     if (!(ast instanceof List)) return eval_ast(ast, env);
     if (ast.isEmpty()) return ast;
 
@@ -99,6 +117,13 @@ const EVAL = (ast, env) => {
       ast = quasiquote(ast.ast[1]);
       continue;
     }
+    if (symbol === 'defmacro!') {
+      if (ast.ast.length !== 3) throw new Error('Too many arguments to defmaacro!');
+      const fn = EVAL(ast.ast[2], env);
+      fn.setIsMacro(true);
+      return env.set(ast.ast[1], fn);
+    }
+    if (symbol === 'macroexpand') return macroExpand(ast.ast[1], env);
 
     const [fn, ...args] = eval_ast(ast, env).ast;
 

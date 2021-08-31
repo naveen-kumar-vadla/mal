@@ -235,12 +235,13 @@ class MalSymbol extends MalValue {
 }
 
 class MalFunction extends MalValue {
-  constructor(ast = null, binds = [], env = null, fn = null) {
+  constructor(ast = null, binds = [], env = null, fn = null, is_macro = false) {
     super();
     this.ast = ast;
     this.binds = binds;
     this.env = env;
     this.fn = fn;
+    this.is_macro = is_macro;
   }
 
   print_str(print_readably = false) {
@@ -265,6 +266,10 @@ class MalFunction extends MalValue {
 
   clone() {
     return new MalFunction(clone(this.ast), this.binds, this.env, this.fn);
+  }
+
+  setIsMacro(is_macro = this.is_macro) {
+    return this.is_macro = is_macro;
   }
 }
 
