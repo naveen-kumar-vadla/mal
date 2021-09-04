@@ -88,6 +88,22 @@ class MalSequence extends MalValue {
   toVector() {
     return new Vector(this.clone().ast);
   }
+
+  reduce(fn, initialValue) {
+    const list = this.clone();
+    if (list.isEmpty() && initialValue === undefined) throw new Error(`Reduce of empty List/Vector with no Initial Value`);
+    if (initialValue !== undefined) (list = list.unshift(initialValue));
+    
+    return list.rest(0).ast.reduce((result, elt) => fn.apply(null, [result, elt]));
+  }
+
+  map(fn) {
+    return new List(this.ast.map(elt => fn.apply(null, [elt])));
+  }
+
+  filter(fn) {
+    return new List(this.ast.filter(elt => fn.apply(null, [elt])));
+  }
 }
 
 class List extends MalSequence {

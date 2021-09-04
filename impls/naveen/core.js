@@ -1,6 +1,6 @@
 const fs = require('fs');
 const { Env } = require('./env');
-const { MalValue, MalSymbol, Nil, Str, List, isEqual, Atom, Vector, MalSequence  } = require('./types');
+const { MalValue, MalSymbol, Nil, Str, List, isEqual, Atom, MalSequence, MalFunction  } = require('./types');
 const { print_str } = require('./printer');
 const { read_str } = require('./reader');
 
@@ -145,6 +145,24 @@ const rest = (list) => {
   return list.rest(0);
 };
 
+const reduce = (list, fn, initialValue) => {
+  if (!(list instanceof MalSequence)) throw new Error(`${print_str(list)} is not a List/Vector`);
+  if (!(fn instanceof MalFunction)) throw new Error(`${print_str(list)} is not a Function`);
+  return list.reduce(fn, initialValue);
+};
+
+const map = (list, fn) => {
+  if (!(list instanceof MalSequence)) throw new Error(`${print_str(list)} is not a List/Vector`);
+  if (!(fn instanceof MalFunction)) throw new Error(`${print_str(list)} is not a Function`);
+  return list.map(fn);
+};
+
+const filter = (list, fn) => {
+  if (!(list instanceof MalSequence)) throw new Error(`${print_str(list)} is not a List/Vector`);
+  if (!(fn instanceof MalFunction)) throw new Error(`${print_str(list)} is not a Function`);
+  return list.filter(fn);
+};
+
 const coreEnv = new Env();
 
 coreEnv.set(new MalSymbol('+'), add);
@@ -185,5 +203,9 @@ coreEnv.set(new MalSymbol('vec'), listToVector);
 coreEnv.set(new MalSymbol('nth'), nth);
 coreEnv.set(new MalSymbol('first'), first);
 coreEnv.set(new MalSymbol('rest'), rest);
+
+coreEnv.set(new MalSymbol('reduce'), reduce);
+coreEnv.set(new MalSymbol('map'), map);
+coreEnv.set(new MalSymbol('filter'), filter);
 
 module.exports = { coreEnv };
