@@ -4,6 +4,12 @@ const { MalValue, MalSymbol, Nil, Str, List, isEqual, Atom, Vector, MalSequence 
 const { print_str } = require('./printer');
 const { read_str } = require('./reader');
 
+const NOT_A_MAL_SEQUENCE_ERROR = (val) => new Error(`${print_str(val)} is not a List/Vector`);
+const NOT_AN_ATOM_ERROR = (val) => new Error(`${print_str(val)} is not an Atom`);
+const NOT_A_STRING_ERROR = (val) => new Error(`${print_str(val)} is not a String`);
+const FILE_NOT_FOUND_ERROR = (filePath) => new Error(`file '${filePath}' not found`);
+const METHOD_NOT_FOUND = (methodName, ast) => new Error(`cannot check '${methodName}' for ${print_str(ast)}`);
+
 const add = (...args) => args.reduce((a, b) => a + b, 0);
 
 const subtract = (...args) => {
@@ -43,12 +49,12 @@ const isList = (list) => list instanceof List;
 
 const isEmpty = (ast) => {
   if (ast instanceof MalValue) return ast.isEmpty();
-  throw new Error(`cannot check 'empty?' for ${print_str(ast)}`);
+  throw METHOD_NOT_FOUND('empty?', ast);
 };
 
 const count = (ast) => {
   if (ast instanceof MalValue) return ast.count();
-  throw new Error(`cannot check 'count' for ${print_str(ast)}`);
+  throw METHOD_NOT_FOUND('count', ast);
 };
 
 const isLesser = (...args) => {
@@ -73,7 +79,7 @@ const isGreaterOrEqual = (...args) => {
 
 const readString = (ast) => {
   if (ast instanceof Str) return read_str(ast.print_str());
-  throw new Error(`${print_str(ast)} is not a String`);
+  throw NOT_A_STRING_ERROR(ast);
 }
 
 const slurp = (ast) => {
@@ -83,7 +89,7 @@ const slurp = (ast) => {
   try {
     return new Str(fs.readFileSync(filePath, 'utf-8'));
   } catch (e) {
-    throw new Error(`file '${filePath}' not found`);
+    throw FILE_NOT_FOUND_ERROR(filePath);
   }
 }
 
@@ -93,57 +99,49 @@ const isAtom = (val) => (val instanceof Atom);
 
 const derefAtom = (val) => {
   if (val instanceof Atom) return val.value;
-  throw new Error(`${print_str(val)} is not an Atom`);
+  throw NOT_AN_ATOM_ERROR(val);
 };
 
 const resetAtom = (atom, val) => {
   if (atom instanceof Atom) return atom.reset(val);
-  throw new Error(`${print_str(atom)} is not an Atom`);
+  throw NOT_AN_ATOM_ERROR(atom);
 };
 
 const swapAtomValue = (atom, fn, ...params) => {
-  if (!(atom instanceof Atom)) throw new Error(`${print_str(atom)} is not an Atom`);
+  if (!(atom instanceof Atom)) throw NOT_AN_ATOM_ERROR(atom);
   const val = fn.apply(null, [atom.value, ...params]);
   return atom.reset(val);
 };
 
 const constructNewList = (firstElement, list) => {
-  if (!(list instanceof MalSequence)) throw new Error(`${print_str(list)} is not a List/Vector`);
-  const clonedList = list.clone();
-  return new List([firstElement, ...clonedList.ast]);
+  if (!(list instanceof MalSequence)) throw NOT_A_MAL_SEQUENCE_ERROR(list);
+  return list.unshift(firstElement);
 };
 
 const concatenateLists = (...lists) => {
-  const newAst = lists.reduce((ast, list) => {
-    if (!(list instanceof MalSequence)) throw new Error(`${print_str(list)} is not a List/Vector`);
-    return ast.concat(list.clone().ast)
-  }, []);
-  return new List(newAst);
+  if (lists.some(list => !(list instanceof MalSequence))) throw NOT_A_MAL_SEQUENCE_ERROR(list);
+  return lists.reduce((ast, list) => ast.concat(list), new List([]));
 };
 
-const listToVector = (list) => {
-  if (list instanceof List) return new Vector(list.clone().ast);
-  if (list instanceof Vector) return list;
-  throw new Error(`${print_str(list)} is not a List/Vector`);
+const listToVector = (ast) => {
+  if (!(ast instanceof MalSequence)) throw NOT_A_MAL_SEQUENCE_ERROR(ast);
+  return ast.toVector();
 };
 
 const nth = (list, index) => {
-  if (!(list instanceof MalSequence)) throw new Error(`${print_str(list)} is not a List/Vector`);
+  if (!(list instanceof MalSequence)) throw NOT_A_MAL_SEQUENCE_ERROR(list);
   return list.nth(index);
 };
 
 const first = (list) => {
   if (list === Nil) return Nil;
-  if (!(list instanceof MalSequence)) throw new Error(`${print_str(list)} is not a List/Vector`);
-  if (list.isEmpty()) return Nil;
+  if (!(list instanceof MalSequence)) throw NOT_A_MAL_SEQUENCE_ERROR(list);
   return list.nth(0);
 };
 
 const rest = (list) => {
-  const emptyList = new List([]);
-  if (list === Nil) return emptyList;
-  if (!(list instanceof MalSequence)) throw new Error(`${print_str(list)} is not a List/Vector`);
-  if (list.isEmpty()) return emptyList;
+  if (list === Nil) return new List([]);
+  if (!(list instanceof MalSequence)) throw NOT_A_MAL_SEQUENCE_ERROR(list);
   return list.rest(0);
 };
 
@@ -183,9 +181,7 @@ coreEnv.set(new MalSymbol('swap!'), swapAtomValue);
 
 coreEnv.set(new MalSymbol('cons'), constructNewList);
 coreEnv.set(new MalSymbol('concat'), concatenateLists);
-
 coreEnv.set(new MalSymbol('vec'), listToVector);
-
 coreEnv.set(new MalSymbol('nth'), nth);
 coreEnv.set(new MalSymbol('first'), first);
 coreEnv.set(new MalSymbol('rest'), rest);

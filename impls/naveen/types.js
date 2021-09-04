@@ -67,12 +67,26 @@ class MalSequence extends MalValue {
   }
 
   nth(index = -1) {
+    if (this.isEmpty()) return Nil;
     if(index < 0 || index >= this.ast.length) throw new Error(`nth: ${index} - index out of range`);
     return this.ast[index];
   }
 
   rest(index = -1) {
-    return new List(this.ast.slice().filter((_, i) => i !== index));
+    if (this.isEmpty()) return new List([]);
+    return new List(this.ast.filter((_, i) => i !== index));
+  }
+
+  unshift(firstElement) {
+    return new List([firstElement, ...this.clone().ast]);
+  }
+
+  concat(other) {
+    return new List(this.ast.concat(other.clone().ast));
+  }
+
+  toVector() {
+    return new Vector(this.clone().ast);
   }
 }
 
