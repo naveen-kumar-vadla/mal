@@ -163,6 +163,18 @@ const filter = (list, fn) => {
   return list.filter(fn);
 };
 
+const some = (list, fn) => {
+  if (!(list instanceof MalSequence)) throw new Error(`${print_str(list)} is not a List/Vector`);
+  if (!(fn instanceof MalFunction)) throw new Error(`${print_str(list)} is not a Function`);
+  return list.some(fn);
+};
+
+const every = (list, fn) => {
+  if (!(list instanceof MalSequence)) throw new Error(`${print_str(list)} is not a List/Vector`);
+  if (!(fn instanceof MalFunction)) throw new Error(`${print_str(list)} is not a Function`);
+  return list.every(fn);
+};
+
 const coreEnv = new Env();
 
 coreEnv.set(new MalSymbol('+'), add);
@@ -207,5 +219,7 @@ coreEnv.set(new MalSymbol('rest'), rest);
 coreEnv.set(new MalSymbol('reduce'), reduce);
 coreEnv.set(new MalSymbol('map'), map);
 coreEnv.set(new MalSymbol('filter'), filter);
+coreEnv.set(new MalSymbol('some?'), some);
+coreEnv.set(new MalSymbol('every?'), every);
 
 module.exports = { coreEnv };

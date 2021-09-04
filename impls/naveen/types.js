@@ -104,6 +104,14 @@ class MalSequence extends MalValue {
   filter(fn) {
     return new List(this.ast.filter(elt => fn.apply(null, [elt])));
   }
+
+  some(fn) {
+    return this.ast.some(elt => fn.apply(null, [elt]));
+  }
+
+  every(fn) {
+    return this.ast.every(elt => fn.apply(null, [elt]));
+  }
 }
 
 class List extends MalSequence {
