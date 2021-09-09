@@ -1,4 +1,12 @@
-const { List, Vector, Nil, Str, Keyword, MalSymbol, HashMap } = require('./types');
+const {
+  List,
+  Vector,
+  Nil,
+  Str,
+  Keyword,
+  MalSymbol,
+  HashMap,
+} = require('./types');
 
 class Reader {
   constructor(tokens) {
@@ -17,15 +25,15 @@ class Reader {
   }
 }
 
-const tokenize = (str) => {
+const tokenize = str => {
   const regEx = /[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`,;)]*)/g;
   return [...str.matchAll(regEx)]
-    .map((x) => x[1])
+    .map(x => x[1])
     .filter(x => x[0] !== ';')
     .slice(0, -1);
 };
 
-const read_atom = (reader) => {
+const read_atom = reader => {
   const token = reader.next();
   if (token.match(/^-?[0-9]+$/)) return parseInt(token);
   if (token.match(/^-?[0-9][0-9.]*$/)) return parseFloat(token);
@@ -34,7 +42,9 @@ const read_atom = (reader) => {
   if (token === 'nil') return Nil;
   if (token[0] === ':') return new Keyword(token.slice(1));
   if (token.match(/^"(?:\\.|[^\\"])*"$/)) {
-    const str = token.slice(1, token.length - 1).replace(/\\(.)/g, (_, c) => c === "n" ? "\n" : c)
+    const str = token
+      .slice(1, token.length - 1)
+      .replace(/\\(.)/g, (_, c) => (c === 'n' ? '\n' : c));
     return new Str(str);
   }
   if (token[0] === '"') throw new Error(`expected '"', got end of input`);
@@ -55,17 +65,17 @@ const read_seq = (reader, closingCharacter) => {
   return ast;
 };
 
-const read_list = (reader) => {
+const read_list = reader => {
   const ast = read_seq(reader, ')');
   return new List(ast);
 };
 
-const read_vector = (reader) => {
+const read_vector = reader => {
   const ast = read_seq(reader, ']');
   return new Vector(ast);
 };
 
-const read_hashmap = (reader) => {
+const read_hashmap = reader => {
   const ast = read_seq(reader, '}');
   if (ast.length % 2 !== 0) throw new Error('Odd number of hash map arguments');
   return new HashMap(ast);
@@ -75,10 +85,10 @@ const prepend_symbol = (reader, symbolName) => {
   reader.next();
   const symbol = new MalSymbol(symbolName);
   const newAst = read_form(reader);
-  return new List([symbol, newAst])
+  return new List([symbol, newAst]);
 };
 
-const read_form = (reader) => {
+const read_form = reader => {
   const token = reader.peek();
   if (token === undefined) return Nil;
 
@@ -102,7 +112,7 @@ const read_form = (reader) => {
   return read_atom(reader);
 };
 
-const read_str = (str) => {
+const read_str = str => {
   const tokens = tokenize(str);
   const reader = new Reader(tokens);
   return read_form(reader);

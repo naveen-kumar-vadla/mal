@@ -1,14 +1,37 @@
 const fs = require('fs');
 const { Env } = require('./env');
-const { MalValue, MalSymbol, Nil, Str, List, isEqual, Atom, MalSequence, MalFunction  } = require('./types');
+const {
+  MalValue,
+  MalSymbol,
+  Nil,
+  Str,
+  List,
+  isEqual,
+  Atom,
+  MalSequence,
+  MalFunction,
+} = require('./types');
 const { print_str } = require('./printer');
 const { read_str } = require('./reader');
 
-const NOT_A_MAL_SEQUENCE_ERROR = (val) => new Error(`${print_str(val)} is not a List/Vector`);
-const NOT_AN_ATOM_ERROR = (val) => new Error(`${print_str(val)} is not an Atom`);
-const NOT_A_STRING_ERROR = (val) => new Error(`${print_str(val)} is not a String`);
-const FILE_NOT_FOUND_ERROR = (filePath) => new Error(`file '${filePath}' not found`);
-const METHOD_NOT_FOUND = (methodName, ast) => new Error(`cannot check '${methodName}' for ${print_str(ast)}`);
+const NOT_A_MAL_SEQUENCE_ERROR = val =>
+  new Error(`${print_str(val)} is not a List/Vector`);
+
+const NOT_AN_ATOM_ERROR = val => new Error(`${print_str(val)} is not an Atom`);
+
+const NOT_A_STRING_ERROR = val =>
+  new Error(`${print_str(val)} is not a String`);
+
+const FILE_NOT_FOUND_ERROR = filePath =>
+  new Error(`file '${filePath}' not found`);
+
+const METHOD_NOT_FOUND = (methodName, ast) =>
+  new Error(`cannot check '${methodName}' for ${print_str(ast)}`);
+
+const NOT_A_FUNCTION_ERROR = value =>
+  new Error(`${print_str(value)} is not a Function`);
+
+const SYMBOL_NOT_FOUND_ERROR = (symbol) => new Error(`symbol '${symbol}' not found`);
 
 const add = (...args) => args.reduce((a, b) => a + b, 0);
 
@@ -32,7 +55,7 @@ const remainder = (...args) => {
 const prn = (...args) => {
   console.log(args.map(x => print_str(x, true)).join(' '));
   return Nil;
-}
+};
 
 const println = (...args) => {
   console.log(args.map(x => print_str(x, false)).join(' '));
@@ -45,14 +68,14 @@ const str = (...args) => new Str(args.map(x => print_str(x, false)).join(''));
 
 const makeList = (...args) => new List(args);
 
-const isList = (list) => list instanceof List;
+const isList = list => list instanceof List;
 
-const isEmpty = (ast) => {
+const isEmpty = ast => {
   if (ast instanceof MalValue) return ast.isEmpty();
   throw METHOD_NOT_FOUND('empty?', ast);
 };
 
-const count = (ast) => {
+const count = ast => {
   if (ast instanceof MalValue) return ast.count();
   throw METHOD_NOT_FOUND('count', ast);
 };
@@ -77,12 +100,12 @@ const isGreaterOrEqual = (...args) => {
   return args.reduce((a, b) => a >= b);
 };
 
-const readString = (ast) => {
+const readString = ast => {
   if (ast instanceof Str) return read_str(ast.print_str());
   throw NOT_A_STRING_ERROR(ast);
-}
+};
 
-const slurp = (ast) => {
+const slurp = ast => {
   if (!(ast instanceof Str)) throw new Error(`cannot open <${print_str(ast)}> as an InputStream.`);
   const filePath = ast.print_str();
 
@@ -91,13 +114,13 @@ const slurp = (ast) => {
   } catch (e) {
     throw FILE_NOT_FOUND_ERROR(filePath);
   }
-}
+};
 
-const makeAtom = (val) => new Atom(val);
+const makeAtom = val => new Atom(val);
 
-const isAtom = (val) => (val instanceof Atom);
+const isAtom = val => val instanceof Atom;
 
-const derefAtom = (val) => {
+const derefAtom = val => {
   if (val instanceof Atom) return val.value;
   throw NOT_AN_ATOM_ERROR(val);
 };
@@ -123,7 +146,7 @@ const concatenateLists = (...lists) => {
   return lists.reduce((ast, list) => ast.concat(list), new List([]));
 };
 
-const listToVector = (ast) => {
+const listToVector = ast => {
   if (!(ast instanceof MalSequence)) throw NOT_A_MAL_SEQUENCE_ERROR(ast);
   return ast.toVector();
 };
@@ -133,45 +156,45 @@ const nth = (list, index) => {
   return list.nth(index);
 };
 
-const first = (list) => {
+const first = list => {
   if (list === Nil) return Nil;
   if (!(list instanceof MalSequence)) throw NOT_A_MAL_SEQUENCE_ERROR(list);
   return list.nth(0);
 };
 
-const rest = (list) => {
+const rest = list => {
   if (list === Nil) return new List([]);
   if (!(list instanceof MalSequence)) throw NOT_A_MAL_SEQUENCE_ERROR(list);
   return list.rest(0);
 };
 
 const reduce = (list, fn, initialValue) => {
-  if (!(list instanceof MalSequence)) throw new Error(`${print_str(list)} is not a List/Vector`);
-  if (!(fn instanceof MalFunction)) throw new Error(`${print_str(list)} is not a Function`);
+  if (!(list instanceof MalSequence)) throw NOT_A_MAL_SEQUENCE_ERROR(list);
+  if (!(fn instanceof MalFunction) && !(fn instanceof Function)) throw NOT_A_FUNCTION_ERROR(fn);
   return list.reduce(fn, initialValue);
 };
 
 const map = (list, fn) => {
-  if (!(list instanceof MalSequence)) throw new Error(`${print_str(list)} is not a List/Vector`);
-  if (!(fn instanceof MalFunction)) throw new Error(`${print_str(list)} is not a Function`);
+  if (!(list instanceof MalSequence)) throw NOT_A_MAL_SEQUENCE_ERROR(list);
+  if (!(fn instanceof MalFunction) && !(fn instanceof Function)) throw NOT_A_FUNCTION_ERROR(fn);
   return list.map(fn);
 };
 
 const filter = (list, fn) => {
-  if (!(list instanceof MalSequence)) throw new Error(`${print_str(list)} is not a List/Vector`);
-  if (!(fn instanceof MalFunction)) throw new Error(`${print_str(list)} is not a Function`);
+  if (!(list instanceof MalSequence)) throw NOT_A_MAL_SEQUENCE_ERROR(list);
+  if (!(fn instanceof MalFunction) && !(fn instanceof Function)) throw NOT_A_FUNCTION_ERROR(fn);
   return list.filter(fn);
 };
 
 const some = (list, fn) => {
-  if (!(list instanceof MalSequence)) throw new Error(`${print_str(list)} is not a List/Vector`);
-  if (!(fn instanceof MalFunction)) throw new Error(`${print_str(list)} is not a Function`);
+  if (!(list instanceof MalSequence)) throw NOT_A_MAL_SEQUENCE_ERROR(list);
+  if (!(fn instanceof MalFunction) && !(fn instanceof Function)) throw NOT_A_FUNCTION_ERROR(fn);
   return list.some(fn);
 };
 
 const every = (list, fn) => {
-  if (!(list instanceof MalSequence)) throw new Error(`${print_str(list)} is not a List/Vector`);
-  if (!(fn instanceof MalFunction)) throw new Error(`${print_str(list)} is not a Function`);
+  if (!(list instanceof MalSequence)) throw NOT_A_MAL_SEQUENCE_ERROR(list);
+  if (!(fn instanceof MalFunction) && !(fn instanceof Function)) throw NOT_A_FUNCTION_ERROR(fn);
   return list.every(fn);
 };
 

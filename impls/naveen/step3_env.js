@@ -6,7 +6,7 @@ const { Env } = require('./env');
 
 const options = {
   input: process.stdin,
-  output: process.stdout
+  output: process.stdout,
 };
 
 const rl = readline.createInterface(options);
@@ -15,23 +15,23 @@ const env = new Env();
 env.set(new MalSymbol('pi'), Math.PI);
 env.set(new MalSymbol('+'), (...args) => {
   if (args.length < 2) args.unshift(0);
-  return args.reduce((a, b) => a + b)
+  return args.reduce((a, b) => a + b);
 });
 env.set(new MalSymbol('-'), (...args) => {
   if (args.length < 2) args.unshift(0);
-  return args.reduce((a, b) => a - b)
+  return args.reduce((a, b) => a - b);
 });
 env.set(new MalSymbol('*'), (...args) => {
   if (args.length < 2) args.unshift(1);
-  return args.reduce((a, b) => a * b)
+  return args.reduce((a, b) => a * b);
 });
 env.set(new MalSymbol('/'), (...args) => {
   if (args.length < 2) args.unshift(1);
-  return args.reduce((a, b) => a / b)
+  return args.reduce((a, b) => a / b);
 });
 env.set(new MalSymbol('%'), (...args) => {
   if (args.length < 2) args.unshift(0);
-  return args.reduce((a, b) => a % b)
+  return args.reduce((a, b) => a % b);
 });
 
 const eval_ast = (ast, env) => {
@@ -51,7 +51,7 @@ const eval_ast = (ast, env) => {
   return ast;
 };
 
-const READ = (str) => read_str(str);
+const READ = str => read_str(str);
 
 const EVAL = (ast, env) => {
   if (!(ast instanceof List)) return eval_ast(ast, env);
@@ -71,21 +71,19 @@ const EVAL = (ast, env) => {
   if (!(fn instanceof Function)) throw new Error(`'${fn}' is not a function`);
 
   return fn.apply(null, args);
-}
+};
 
-const PRINT = (ast) => print_str(ast, true);
+const PRINT = ast => print_str(ast, true);
 
-const rep = (str) => PRINT(EVAL(READ(str), env));
+const rep = str => PRINT(EVAL(READ(str), env));
 
 const main = () => {
-  rl.question('user> ', (str) => {
+  rl.question('user> ', str => {
     try {
       console.log(rep(str));
-    }
-    catch (e) {
+    } catch (e) {
       console.log(e.message);
-    }
-    finally {
+    } finally {
       main();
     }
   });

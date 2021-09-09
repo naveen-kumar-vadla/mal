@@ -5,13 +5,13 @@ const print_str = (ast, print_readably) => {
 
 const isEqual = (...args) => {
   const firstElement = args[0];
-  let comparator = (x) => x === firstElement;
-  if (firstElement instanceof MalValue) comparator = (x) => firstElement.isEqual(x);
+  let comparator = x => x === firstElement;
+  if (firstElement instanceof MalValue) comparator = x => firstElement.isEqual(x);
 
   return args.slice(1).every(comparator);
 };
 
-const clone = (ast) => {
+const clone = ast => {
   if (ast instanceof MalValue) return ast.clone();
   if (Array.isArray(ast)) return ast.slice();
   return ast;
@@ -68,7 +68,7 @@ class MalSequence extends MalValue {
 
   nth(index = -1) {
     if (this.isEmpty()) return Nil;
-    if(index < 0 || index >= this.ast.length) throw new Error(`nth: ${index} - index out of range`);
+    if (index < 0 || index >= this.ast.length) throw new Error(`nth: ${index} - index out of range`);
     return this.ast[index];
   }
 
@@ -90,11 +90,11 @@ class MalSequence extends MalValue {
   }
 
   reduce(fn, initialValue) {
-    const list = this.clone();
-    if (list.isEmpty() && initialValue === undefined) throw new Error(`Reduce of empty List/Vector with no Initial Value`);
-    if (initialValue !== undefined) (list = list.unshift(initialValue));
-    
-    return list.rest(0).ast.reduce((result, elt) => fn.apply(null, [result, elt]));
+    if (this.isEmpty() && initialValue === undefined) throw new Error(`Reduce of empty List/Vector with no Initial Value`);
+    const reducer = (result, elt) => fn.apply(null, [result, elt]);
+    return initialValue === undefined
+      ? this.ast.reduce(reducer)
+      : this.ast.reduce(reducer, initialValue);
   }
 
   map(fn) {
@@ -314,7 +314,7 @@ class MalFunction extends MalValue {
   }
 
   setIsMacro(is_macro = this.is_macro) {
-    return this.is_macro = is_macro;
+    return (this.is_macro = is_macro);
   }
 }
 
@@ -368,7 +368,7 @@ class Atom extends MalValue {
   }
 
   reset(value) {
-    return this.value = value;
+    return (this.value = value);
   }
 
   clone() {
@@ -392,5 +392,5 @@ module.exports = {
   Atom,
   print_str,
   isEqual,
-  clone
+  clone,
 };

@@ -1,20 +1,28 @@
 const readline = require('readline');
 const { read_str } = require('./reader');
 const { print_str } = require('./printer');
-const { MalSymbol, List, Vector, HashMap, Nil, MalFunction, Str } = require('./types');
+const {
+  MalSymbol,
+  List,
+  Vector,
+  HashMap,
+  Nil,
+  MalFunction,
+  Str,
+} = require('./types');
 const { Env } = require('./env');
 const { coreEnv } = require('./core');
 
 const options = {
   input: process.stdin,
-  output: process.stdout
+  output: process.stdout,
 };
 
 const rl = readline.createInterface(options);
 
 const env = new Env(coreEnv);
-env.set(new MalSymbol('eval'), (ast) => EVAL(ast, env));
-env.set(new MalSymbol('*ARGV*'), new List(process.argv.slice(3).map(s => new Str(s))));
+env.set(new MalSymbol('eval'), ast => EVAL(ast, env));
+env.set(new MalSymbol('*ARGV*'),new List(process.argv.slice(3).map(s => new Str(s))));
 
 const eval_ast = (ast, env) => {
   if (ast instanceof MalSymbol) return env.get(ast);
@@ -29,14 +37,18 @@ const eval_ast = (ast, env) => {
   return ast;
 };
 
-const READ = (str) => read_str(str);
+const READ = str => read_str(str);
 
-const populate = (ast) => {
+const populate = ast => {
   let result = new List([]);
 
   for (let i = ast.count() - 1; i >= 0; i--) {
     const elt = ast.ast[i];
-    if (elt instanceof List && elt.ast[0] instanceof MalSymbol && elt.ast[0].symbol === 'splice-unquote') {
+    if (
+      elt instanceof List &&
+      elt.ast[0] instanceof MalSymbol &&
+      elt.ast[0].symbol === 'splice-unquote'
+    ) {
       result = new List([new MalSymbol('concat'), elt.ast[1], result]);
     } else {
       result = new List([new MalSymbol('cons'), quasiquote(elt), result]);
@@ -46,12 +58,12 @@ const populate = (ast) => {
   return result;
 };
 
-const quasiquote = (ast) => {
-  if ((ast instanceof HashMap) || (ast instanceof MalSymbol)) return new List([new MalSymbol('quote'), ast]);
+const quasiquote = ast => {
+  if (ast instanceof HashMap || ast instanceof MalSymbol) return new List([new MalSymbol('quote'), ast]);
   if (ast instanceof Vector) return new List([new MalSymbol('vec'), populate(ast)]);
   if (ast instanceof List) {
     const firstElement = ast.ast[0];
-    if ((firstElement instanceof MalSymbol) && firstElement.symbol === 'unquote') return ast.ast[1];
+    if (firstElement instanceof MalSymbol && firstElement.symbol === 'unquote') return ast.ast[1];
     return populate(ast);
   }
   return ast;
@@ -62,7 +74,11 @@ const isMacro = (ast, env) => {
   if (ast.isEmpty()) return false;
   const firstElt = ast.ast[0];
   const firstEltValue = env.find(firstElt) && env.get(firstElt);
-  return firstElt instanceof MalSymbol && (firstEltValue instanceof MalFunction) && firstEltValue.is_macro;
+  return (
+    firstElt instanceof MalSymbol &&
+    firstEltValue instanceof MalFunction &&
+    firstEltValue.is_macro
+  );
 };
 
 const macroExpand = (ast, env) => {
@@ -104,7 +120,7 @@ const EVAL = (ast, env) => {
     }
     if (symbol === 'if') {
       const expr = EVAL(ast.ast[1], env);
-      ast = (expr === Nil || expr === false) ? ast.ast[3] : ast.ast[2];
+      ast = expr === Nil || expr === false ? ast.ast[3] : ast.ast[2];
       continue;
     }
     if (symbol === 'fn*') {
@@ -119,7 +135,7 @@ const EVAL = (ast, env) => {
       continue;
     }
     if (symbol === 'defmacro!') {
-      if (ast.ast.length !== 3) throw new Error('Too many arguments to defmaacro!');
+      if (ast.ast.length !== 3) throw new Error('Too many arguments to defmacro!');
       const fn = EVAL(ast.ast[2], env);
       fn.setIsMacro(true);
       return env.set(ast.ast[1], fn);
@@ -137,26 +153,24 @@ const EVAL = (ast, env) => {
 
     return fn.apply(null, args);
   }
-}
+};
 
-const PRINT = (ast) => print_str(ast, true);
+const PRINT = ast => print_str(ast, true);
 
-const rep = (str) => PRINT(EVAL(READ(str), env));
+const rep = str => PRINT(EVAL(READ(str), env));
 
 rep('(def! not (fn* (x) (if x false true)))');
 rep('(def! sqrt (fn* (x) (* x x)))');
 rep('(def! load-file (fn* (f) (eval (read-string (str "(do " (slurp f) "\nnil)")))))');
-rep('(defmacro! cond (fn* (& xs) (if (> (count xs) 0) (list \'if (first xs) (if (> (count xs) 1) (nth xs 1) (throw \"odd number of forms to cond\")) (cons \'cond (rest (rest xs)))))))');
+rep('(defmacro! cond (fn* (& xs) (if (> (count xs) 0) (list \'if (first xs) (if (> (count xs) 1) (nth xs 1) (throw "odd number of forms to cond")) (cons \'cond (rest (rest xs)))))))');
 
 const main = () => {
-  rl.question('user> ', (str) => {
+  rl.question('user> ', str => {
     try {
       console.log(rep(str));
-    }
-    catch (e) {
+    } catch (e) {
       console.log(e.message);
-    }
-    finally {
+    } finally {
       main();
     }
   });
@@ -165,13 +179,11 @@ const main = () => {
 const executeProgramFile = () => {
   try {
     rep(`(load-file "${process.argv[2]}")`);
-  }
-  catch (e) {
+  } catch (e) {
     console.log(e.message);
-  }
-  finally {
+  } finally {
     process.exit(0);
   }
-}
+};
 
 process.argv.length > 2 ? executeProgramFile() : main();

@@ -7,7 +7,7 @@ const { coreEnv } = require('./core');
 
 const options = {
   input: process.stdin,
-  output: process.stdout
+  output: process.stdout,
 };
 
 const rl = readline.createInterface(options);
@@ -27,7 +27,7 @@ const eval_ast = (ast, env) => {
   return ast;
 };
 
-const READ = (str) => read_str(str);
+const READ = str => read_str(str);
 
 const EVAL = (ast, env) => {
   if (ast === undefined) return Nil;
@@ -46,7 +46,9 @@ const EVAL = (ast, env) => {
   if (symbol === 'do') return ast.ast.slice(1).reduce((_, form) => EVAL(form, env), Nil);
   if (symbol === 'if') {
     const expr = EVAL(ast.ast[1], env);
-    return (expr === Nil || expr === false) ? EVAL(ast.ast[3], env) : EVAL(ast.ast[2], env);
+    return expr === Nil || expr === false
+      ? EVAL(ast.ast[3], env)
+      : EVAL(ast.ast[2], env);
   }
   if (symbol === 'fn*') return (...exprs) => EVAL(ast.ast[2], Env.create(env, ast.ast[1].ast, exprs));
 
@@ -54,23 +56,21 @@ const EVAL = (ast, env) => {
   if (!(fn instanceof Function)) throw new Error(`'${fn}' is not a function`);
 
   return fn.apply(null, args);
-}
+};
 
-const PRINT = (ast) => print_str(ast, true);
+const PRINT = ast => print_str(ast, true);
 
-const rep = (str) => PRINT(EVAL(READ(str), env));
+const rep = str => PRINT(EVAL(READ(str), env));
 
 rep('(def! not (fn* (x) (if x false true)))');
 
 const main = () => {
-  rl.question('user> ', (str) => {
+  rl.question('user> ', str => {
     try {
       console.log(rep(str));
-    }
-    catch (e) {
+    } catch (e) {
       console.log(e.message);
-    }
-    finally {
+    } finally {
       main();
     }
   });

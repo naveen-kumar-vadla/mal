@@ -21,8 +21,6 @@ class Env {
   }
 
   get(key) {
-    if (!(key instanceof MalSymbol)) throw new Error(`${key} is not a symbol`);
-
     const env = this.find(key);
     if (env) return env.data.get(key.symbol);
 
@@ -31,19 +29,16 @@ class Env {
 
   static create(outer = null, binds = [], exprs = []) {
     const env = new Env(outer);
-    let andNotFound = true;
 
     for (let i = 0; i < binds.length && andNotFound; i++) {
-      let key = binds[i];
-      let value = exprs[i];
-      if (key.symbol === '&') {
-        key = binds[i + 1];
-        value = new List(exprs.slice(i));
-        andNotFound = false;
+      if (binds[i].symbol === '&') {
+        env.set(binds[i + 1], new List(exprs.slice(i)));
+        break;
       }
-      if (value === undefined) throw new Error(`No value provided for '${print_str(key)}'`);
-      env.set(key, value);
+      if (exprs[i] === undefined) throw new Error(`No value provided for '${print_str(binds[i])}'`);
+      env.set(binds[i], exprs[i]);
     }
+
     return env;
   }
 }

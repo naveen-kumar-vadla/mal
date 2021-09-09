@@ -1,19 +1,27 @@
 const readline = require('readline');
 const { read_str } = require('./reader');
 const { print_str } = require('./printer');
-const { MalSymbol, List, Vector, HashMap, Nil, MalFunction, Str } = require('./types');
+const {
+  MalSymbol,
+  List,
+  Vector,
+  HashMap,
+  Nil,
+  MalFunction,
+  Str,
+} = require('./types');
 const { Env } = require('./env');
 const { coreEnv } = require('./core');
 
 const options = {
   input: process.stdin,
-  output: process.stdout
+  output: process.stdout,
 };
 
 const rl = readline.createInterface(options);
 
 const env = new Env(coreEnv);
-env.set(new MalSymbol('eval'), (ast) => EVAL(ast, env));
+env.set(new MalSymbol('eval'), ast => EVAL(ast, env));
 env.set(new MalSymbol('*ARGV*'), new List(process.argv.slice(3).map(s => new Str(s))));
 
 const eval_ast = (ast, env) => {
@@ -29,7 +37,7 @@ const eval_ast = (ast, env) => {
   return ast;
 };
 
-const READ = (str) => read_str(str);
+const READ = str => read_str(str);
 
 const EVAL = (ast, env) => {
   while (true) {
@@ -60,7 +68,7 @@ const EVAL = (ast, env) => {
     }
     if (symbol === 'if') {
       const expr = EVAL(ast.ast[1], env);
-      ast = (expr === Nil || expr === false) ? ast.ast[3] : ast.ast[2];
+      ast = expr === Nil || expr === false ? ast.ast[3] : ast.ast[2];
       env = env;
       continue;
     }
@@ -81,25 +89,23 @@ const EVAL = (ast, env) => {
 
     return fn.apply(null, args);
   }
-}
+};
 
-const PRINT = (ast) => print_str(ast, true);
+const PRINT = ast => print_str(ast, true);
 
-const rep = (str) => PRINT(EVAL(READ(str), env));
+const rep = str => PRINT(EVAL(READ(str), env));
 
 rep('(def! not (fn* (x) (if x false true)))');
 rep('(def! sqrt (fn* (x) (* x x)))');
 rep('(def! load-file (fn* (f) (eval (read-string (str "(do " (slurp f) "\nnil)")))))');
 
 const main = () => {
-  rl.question('user> ', (str) => {
+  rl.question('user> ', str => {
     try {
       console.log(rep(str));
-    }
-    catch (e) {
+    } catch (e) {
       console.log(e.message);
-    }
-    finally {
+    } finally {
       main();
     }
   });
@@ -108,13 +114,11 @@ const main = () => {
 const executeProgramFile = () => {
   try {
     rep(`(load-file "${process.argv[2]}")`);
-  }
-  catch (e) {
+  } catch (e) {
     console.log(e.message);
-  }
-  finally {
+  } finally {
     process.exit(0);
   }
-}
+};
 
 process.argv.length > 2 ? executeProgramFile() : main();
