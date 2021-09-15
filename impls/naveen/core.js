@@ -168,31 +168,31 @@ const rest = list => {
   return list.rest(0);
 };
 
-const reduce = (list, fn, initialValue) => {
+const reduce = (fn, list, initialValue) => {
   if (!(list instanceof MalSequence)) throw NOT_A_MAL_SEQUENCE_ERROR(list);
   if (!(fn instanceof MalFunction) && !(fn instanceof Function)) throw NOT_A_FUNCTION_ERROR(fn);
   return list.reduce(fn, initialValue);
 };
 
-const map = (list, fn) => {
+const map = (fn, list) => {
   if (!(list instanceof MalSequence)) throw NOT_A_MAL_SEQUENCE_ERROR(list);
   if (!(fn instanceof MalFunction) && !(fn instanceof Function)) throw NOT_A_FUNCTION_ERROR(fn);
   return list.map(fn);
 };
 
-const filter = (list, fn) => {
+const filter = (fn, list) => {
   if (!(list instanceof MalSequence)) throw NOT_A_MAL_SEQUENCE_ERROR(list);
   if (!(fn instanceof MalFunction) && !(fn instanceof Function)) throw NOT_A_FUNCTION_ERROR(fn);
   return list.filter(fn);
 };
 
-const some = (list, fn) => {
+const some = (fn, list) => {
   if (!(list instanceof MalSequence)) throw NOT_A_MAL_SEQUENCE_ERROR(list);
   if (!(fn instanceof MalFunction) && !(fn instanceof Function)) throw NOT_A_FUNCTION_ERROR(fn);
   return list.some(fn);
 };
 
-const every = (list, fn) => {
+const every = (fn, list) => {
   if (!(list instanceof MalSequence)) throw NOT_A_MAL_SEQUENCE_ERROR(list);
   if (!(fn instanceof MalFunction) && !(fn instanceof Function)) throw NOT_A_FUNCTION_ERROR(fn);
   return list.every(fn);
